@@ -1,0 +1,1 @@
+-- Se non si usa la gui, qui andranno i comandi del DDL.

@@ -2,59 +2,173 @@
 
 ## 📌 Descrizione
 
-Questo progetto è una web application sviluppata utilizzando il framework Angular.
-L'applicazione è stata realizzata a scopo didattico per mettere in pratica lo sviluppo di interfacce web moderne.
+Applicazione web full-stack sviluppata a scopo didattico.
+
+Il progetto è strutturato in tre parti principali:
+
+* Frontend (Angular)
+* Backend (Node.js + Express)
+* Database (PostgreSQL)
+
+---
+
+## 🧱 Struttura del progetto
+
+### 📁 Frontend
+
+* `Frontend/` → applicazione Angular
+
+---
+
+### 📁 Backend
+
+* `Backend/`
+
+  * `src/`
+
+    * `index.ts` → punto di avvio del server
+    * `db/` → configurazione connessione al database
+    * `routes/` → definizione degli endpoint API
+    * `services/` → logica di business
+    * `repositories/` → gestione query database
+    * `models/` → interfacce e strutture dati
+  * `.env` → variabili d’ambiente
+  * `package.json`
+  * `tsconfig.json`
+  * `node_modules/`
+
+Il backend segue un’architettura a livelli:
+
+* **Routes → Services → Repositories → Database**
+
+---
+
+### 📁 Database
+
+* `Database/`
+
+  * `script/`
+
+    * `create_db.sql` → script SQL (in sviluppo)
+
+---
 
 ## ⚙️ Tecnologie utilizzate
 
-* Angular (Angular CLI)
+### Frontend
+
+* Angular
 * TypeScript
-* HTML5
-* CSS3
+* HTML
+* CSS
+
+### Backend
+
+* Node.js
+* Express
+* TypeScript
+
+### Database
+
+* PostgreSQL
+
+---
 
 ## 🚀 Avvio del progetto
 
-Per eseguire il progetto in locale:
+### Frontend
 
 ```bash
-cd Progetto2-Badini-Angelantoni-Sciarrini
+cd Frontend
 npm install
 ng serve
 ```
 
-Una volta avviato il server, aprire il browser al seguente indirizzo:
-
-```
+Aprire:
 http://localhost:4200/
-```
 
-L'applicazione si aggiornerà automaticamente ad ogni modifica del codice.
+---
 
-## 🏗️ Build del progetto
-
-Per creare una versione ottimizzata per la produzione:
+### Backend
 
 ```bash
-ng build
+cd Backend
+npm install
+npm run dev
 ```
 
-I file generati saranno disponibili nella cartella `dist/`.
+---
+
+## 🗄️ Setup Database (PostgreSQL)
+
+Per eseguire correttamente il progetto è necessario installare PostgreSQL.
+
+### 🔧 Installazione
+
+Scaricare PostgreSQL dal sito ufficiale:
+
+👉 https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
+
+Selezionare la versione più recente disponibile (es. 18.x).
+
+Durante l’installazione:
+
+* Annotare username e password
+* Assicurarsi che il server PostgreSQL sia in esecuzione
+
+---
+
+### 🛠️ pgAdmin 4
+
+Per la gestione del database è consigliato utilizzare **pgAdmin 4**, incluso nell’installazione di PostgreSQL.
+
+Permette di:
+
+* creare database
+* eseguire query SQL
+* gestire tabelle
+
+---
+
+### ▶️ Avvio database
+
+1. Avviare PostgreSQL
+2. Aprire pgAdmin 4
+3. Connettersi al server locale
+
+---
+
+### 📜 Script SQL
+
+Gli script del database si trovano in:
+
+```bash
+Database/script/
+```
+
+Esempio:
+
+* `create_db.sql` → creazione database (in sviluppo)
+
+---
+
+### ⚠️ Nota
+
+Attualmente il backend è configurato ma non ancora collegato al database.
+La configurazione della connessione sarà definita nelle fasi successive dello sviluppo.
+
+---
 
 ## 🌐 Rendering
 
-Il progetto utilizza:
+Il frontend è configurato per supportare:
 
-* **SSG (Static Site Generation / Prerendering)**
+* **SSR (Server-Side Rendering)** → rendering dinamico lato server
+* **SSG (Static Site Generation / Prerendering)** → generazione statica delle pagine in fase di build
 
-Questo significa che le pagine vengono generate in fase di build, migliorando le prestazioni e la velocità di caricamento.
+Questa configurazione permette di scegliere la strategia di rendering più adatta in base alle esigenze dell’applicazione.
 
-## 🧱 Struttura del progetto
-
-* `src/` → contiene il codice sorgente dell'applicazione
-* `src/app/` → componenti principali Angular
-* `public/` → risorse statiche (immagini, file, ecc.)
-* `angular.json` → configurazione del progetto
-* `package.json` → dipendenze e script
+---
 
 ## 👥 Autori
 
@@ -62,6 +176,12 @@ Questo significa che le pagine vengono generate in fase di build, migliorando le
 * Angelantoni
 * Sciarrini
 
-## 📝 Note
+---
 
-Il progetto è stato generato con Angular CLI e configurato con supporto al prerendering (SSG).
+## 📌 Stato del progetto
+
+In sviluppo 🚧
+
+* Architettura full-stack definita
+* Backend strutturato a livelli
+* Database inizializzato (base)
