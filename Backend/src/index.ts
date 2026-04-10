@@ -1,22 +1,16 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import express from "express";
+import auleRoutes from "./routes/aule.routes";
+import prenotazioniRoutes from "./routes/prenotazioni.routes";
 
 const app = express();
-// const PORT = process.env.PORT;
-const PORT = 3000;
 
-app.use(cors());
 app.use(express.json());
 
+app.use("/aule", auleRoutes);
+app.use("/prenotazioni", prenotazioniRoutes);
 
-// endpoints
-
+const PORT = 3000;
 
 app.listen(PORT, () => {
-    console.log(`Server avviato su http://localhost:${PORT}`);
+  console.log(`Server avviato su http://localhost:${PORT}`);
 });
-
-// npm run dev
