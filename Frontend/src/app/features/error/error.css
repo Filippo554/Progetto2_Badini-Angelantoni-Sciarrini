@@ -1,0 +1,32 @@
+body {
+    background-color: #FFFFFF;
+}
+@font-face {
+    font-family: 'Candal';
+    src: url('/fonts/Candal.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+p {
+    display: block;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    font-family: Candal;
+    padding: 0;
+    margin: 0;
+    line-height: 100%;
+    text-align: center;
+}
+.code {
+    top: 90px;
+    height: 200px;
+    font-size: 200px;
+}
+
+.message {
+    top: 390px;
+    height: 50px;
+    font-size: 50px;
+}

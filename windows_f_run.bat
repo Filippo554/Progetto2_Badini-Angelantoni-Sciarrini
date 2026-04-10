@@ -1,4 +1,4 @@
 echo off
 cd ./Frontend/
 cls
-ng serve
+ngx ng serve
