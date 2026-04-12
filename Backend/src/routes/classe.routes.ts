@@ -5,8 +5,12 @@ import { roleMiddleware } from "../middleware/role.middleware";
 
 const router = Router();
 
+function isValidId(id: unknown): id is number {
+  return typeof id === "number" && Number.isInteger(id) && id > 0;
+}
+
 // GET tutte le classi
-router.get("/", authMiddleware, async (req, res) => {
+router.get("/", authMiddleware, async (_req, res) => {
   try {
     const classi = await Classe.findAll({
       order: [
@@ -26,7 +30,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-    if (Number.isNaN(id)) {
+    if (!isValidId(id)) {
       res.status(400).json({ error: "ID non valido" });
       return;
     }
@@ -60,18 +64,23 @@ router.post(
 
       const annoNum = Number(anno);
 
-      if (Number.isNaN(annoNum)) {
+      if (!Number.isInteger(annoNum)) {
         res.status(400).json({ error: "Anno non valido" });
         return;
       }
 
       if (annoNum < 1 || annoNum > 5) {
-        res.status(400).json({ error: "Anno deve essere tra 1 e 5" });
+        res.status(400).json({
+          error: "Anno deve essere tra 1 e 5",
+        });
         return;
       }
 
       const esistente = await Classe.findOne({
-        where: { nome: nome.trim(), anno: annoNum },
+        where: {
+          nome: nome.trim(),
+          anno: annoNum,
+        },
       });
 
       if (esistente) {
@@ -101,7 +110,7 @@ router.delete(
     try {
       const id = Number(req.params.id);
 
-      if (Number.isNaN(id)) {
+      if (!isValidId(id)) {
         res.status(400).json({ error: "ID non valido" });
         return;
       }

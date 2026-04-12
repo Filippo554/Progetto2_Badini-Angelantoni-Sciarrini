@@ -13,42 +13,48 @@ export interface AuthRequest extends Request {
   user?: AuthUser;
 }
 
-// secret sicuro
+// recupero secret
 function getJWTSecret(): string {
   const secret = process.env.JWT_SECRET;
 
   if (!secret) {
-    throw new Error("JWT_SECRET non definito");
+    throw new Error("JWT_SECRET non configurato");
   }
 
   return secret;
 }
 
-// estrazione token robusta
-function extractToken(header?: string): string {
-  if (!header) {
-    throw new Error("Token mancante");
+// estrazione token Bearer
+function extractToken(header: string | undefined): string {
+  if (!header) throw new Error("Authorization header mancante");
+
+  const parts = header.trim().split(" ");
+
+  if (parts.length !== 2) {
+    throw new Error("Formato Authorization non valido");
   }
 
-  const [scheme, token] = header.split(" ");
+  const [scheme, token] = parts;
 
   if (scheme !== "Bearer" || !token) {
-    throw new Error("Formato Authorization non valido");
+    throw new Error("Token Bearer non valido");
   }
 
   return token;
 }
 
-// type guard
 function isAuthUser(payload: unknown): payload is AuthUser {
   if (!payload || typeof payload !== "object") return false;
 
   const p = payload as Record<string, unknown>;
 
+  const validRuoli: RuoloUtente[] = ["studente", "docente", "ata", "admin"];
+
   return (
     typeof p.id === "number" &&
     typeof p.email === "string" &&
-    typeof p.ruolo === "string"
+    typeof p.ruolo === "string" &&
+    validRuoli.includes(p.ruolo as RuoloUtente)
   );
 }
 
@@ -61,31 +67,36 @@ export function authMiddleware(
   try {
     const token = extractToken(req.headers.authorization);
 
-    const decoded = jwt.verify(token, getJWTSecret());
+    const decoded = jwt.verify(token, getJWTSecret()) as JwtPayload | string;
 
     if (typeof decoded === "string") {
-      res.status(401).json({ error: "Token non valido" });
+      res.status(401).json({
+        error: "Token non valido",
+        code: "INVALID_TOKEN",
+      });
       return;
     }
 
-    const payload = decoded as JwtPayload;
-
-    if (!isAuthUser(payload)) {
-      res.status(401).json({ error: "Token malformato" });
+    if (!isAuthUser(decoded)) {
+      res.status(401).json({
+        error: "Token malformato o non valido",
+        code: "MALFORMED_TOKEN",
+      });
       return;
     }
 
     req.user = {
-      id: payload.id,
-      email: payload.email,
-      ruolo: payload.ruolo as RuoloUtente,
+      id: decoded.id,
+      email: decoded.email,
+      ruolo: decoded.ruolo,
     };
 
     next();
-  } catch (err) {
+  } catch {
     res.status(401).json({
-      error:
-        err instanceof Error ? err.message : "Token non valido o scaduto",
+      error: "Non autorizzato",
+      code: "UNAUTHORIZED",
     });
+    return;
   }
 }

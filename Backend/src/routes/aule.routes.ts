@@ -5,8 +5,12 @@ import { roleMiddleware } from "../middleware/role.middleware";
 
 const router = Router();
 
+function isValidId(id: unknown): id is number {
+  return typeof id === "number" && Number.isInteger(id) && id > 0;
+}
+
 // GET tutte le aule
-router.get("/", authMiddleware, async (req, res) => {
+router.get("/", authMiddleware, async (_req, res) => {
   try {
     const aule = await Aula.findAll({
       order: [["numero", "ASC"]],
@@ -23,7 +27,7 @@ router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-    if (Number.isNaN(id)) {
+    if (!isValidId(id)) {
       res.status(400).json({ error: "ID aula non valido" });
       return;
     }
@@ -50,14 +54,9 @@ router.post(
     try {
       const { numero, capienza, descrizione, piano } = req.body;
 
-      if (numero === undefined) {
-        res.status(400).json({ error: "Numero aula obbligatorio" });
-        return;
-      }
-
       const numeroAula = Number(numero);
 
-      if (Number.isNaN(numeroAula)) {
+      if (!Number.isInteger(numeroAula)) {
         res.status(400).json({ error: "Numero aula non valido" });
         return;
       }
@@ -101,7 +100,7 @@ router.delete(
     try {
       const id = Number(req.params.id);
 
-      if (Number.isNaN(id)) {
+      if (!isValidId(id)) {
         res.status(400).json({ error: "ID aula non valido" });
         return;
       }

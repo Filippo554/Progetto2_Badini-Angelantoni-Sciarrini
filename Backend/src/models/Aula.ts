@@ -40,6 +40,9 @@ export class Aula extends Model<
           type: DataTypes.SMALLINT,
           allowNull: false,
           defaultValue: 30,
+          validate: {
+            min: 1,
+          },
         },
 
         descrizione: {
@@ -56,6 +59,7 @@ export class Aula extends Model<
         sequelize,
         tableName: "aula",
         timestamps: false,
+        paranoid: false,
       }
     );
 

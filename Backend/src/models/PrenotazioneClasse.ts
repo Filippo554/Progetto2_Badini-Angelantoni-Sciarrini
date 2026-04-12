@@ -11,7 +11,6 @@ export class PrenotazioneClasse extends Model<
   InferAttributes<PrenotazioneClasse>,
   InferCreationAttributes<PrenotazioneClasse>
 > {
-  // FK coerenti con schema.sql e associations Sequelize
   declare prenotazione_id: ForeignKey<number>;
   declare classe_id: ForeignKey<number>;
 

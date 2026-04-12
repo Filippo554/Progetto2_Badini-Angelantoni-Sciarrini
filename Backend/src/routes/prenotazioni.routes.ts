@@ -1,118 +1,133 @@
 import { Router } from "express";
+import { Op } from "sequelize";
+
 import { Prenotazione } from "../models/Prenotazione";
 import { Aula } from "../models/Aula";
 import { Utente } from "../models/Utente";
 import { Classe } from "../models/Classe";
 
-import { authMiddleware } from "../middleware/auth.middleware";
+import { authMiddleware, AuthRequest } from "../middleware/auth.middleware";
 import { roleMiddleware } from "../middleware/role.middleware";
+import { checkOwner } from "../middleware/checkOwner.middleware";
 
 const router = Router();
 
-// GET tutte prenotazioni
-router.get("/", authMiddleware, async (_req, res) => {
+const INCLUDE_FULL = [
+  { model: Aula, as: "aula" },
+  { model: Utente, as: "utente", attributes: ["id", "nome", "cognome", "email"] },
+  { model: Classe, as: "classi" },
+];
+
+function parseId(id: unknown): number | null {
+  const n = Number(id);
+  return Number.isInteger(n) && n > 0 ? n : null;
+}
+
+function isTimeValid(t: string): boolean {
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(t);
+}
+
+router.get("/", authMiddleware, async (_req, res, next) => {
   try {
     const data = await Prenotazione.findAll({
-      include: [
-        { model: Aula, as: "aula" },
-        { model: Utente, as: "utente" },
-        { model: Classe, as: "classi" },
-      ],
+      include: INCLUDE_FULL,
       order: [
         ["data", "ASC"],
         ["ora_inizio", "ASC"],
       ],
     });
 
-    res.json(data);
-  } catch {
-    res.status(500).json({ error: "Errore recupero prenotazioni" });
+    res.json({ data });
+  } catch (err) {
+    next(err);
   }
 });
 
-// GET singola prenotazione
-router.get("/:id", authMiddleware, async (req, res) => {
+router.get("/:id", authMiddleware, async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = parseId(req.params.id);
 
-    if (Number.isNaN(id)) {
-      res.status(400).json({ error: "ID non valido" });
+    if (!id) {
+      res.status(400).json({ error: "ID non valido", code: "INVALID_ID" });
       return;
     }
 
     const prenotazione = await Prenotazione.findByPk(id, {
-      include: [
-        { model: Aula, as: "aula" },
-        { model: Utente, as: "utente" },
-        { model: Classe, as: "classi" },
-      ],
+      include: INCLUDE_FULL,
     });
 
     if (!prenotazione) {
-      res.status(404).json({ error: "Prenotazione non trovata" });
+      res.status(404).json({ error: "Prenotazione non trovata", code: "NOT_FOUND" });
       return;
     }
 
-    res.json(prenotazione);
-  } catch {
-    res.status(500).json({ error: "Errore server" });
+    res.json({ data: prenotazione });
+  } catch (err) {
+    next(err);
   }
 });
 
-// CREATE prenotazione
 router.post(
   "/",
   authMiddleware,
   roleMiddleware(["docente", "admin", "ata"]),
-  async (req, res) => {
+  async (req: AuthRequest, res, next) => {
     try {
       const { aula_id, data, ora_inizio, ora_fine, note, classi } = req.body;
 
-      if (!aula_id || !data || !ora_inizio || !ora_fine) {
-        res.status(400).json({ error: "Dati mancanti" });
+      const aulaId = parseId(aula_id);
+
+      if (!aulaId || !data || !ora_inizio || !ora_fine) {
+        res.status(400).json({ error: "Campi mancanti", code: "MISSING_FIELDS" });
         return;
       }
 
-      if (ora_fine <= ora_inizio) {
-        res.status(400).json({ error: "Orario non valido" });
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) {
+        res.status(400).json({ error: "Data non valida", code: "INVALID_DATE" });
         return;
       }
 
-      const aulaId = Number(aula_id);
+      if (!isTimeValid(ora_inizio) || !isTimeValid(ora_fine)) {
+        res.status(400).json({ error: "Orario non valido", code: "INVALID_TIME" });
+        return;
+      }
 
-      if (Number.isNaN(aulaId)) {
-        res.status(400).json({ error: "aula_id non valido" });
+      const start = Number(ora_inizio.replace(":", ""));
+      const end = Number(ora_fine.replace(":", ""));
+
+      if (end <= start) {
+        res.status(400).json({ error: "Intervallo orario non valido", code: "INVALID_RANGE" });
         return;
       }
 
       const aula = await Aula.findByPk(aulaId);
 
       if (!aula) {
-        res.status(404).json({ error: "Aula non trovata" });
+        res.status(404).json({ error: "Aula non trovata", code: "NOT_FOUND" });
         return;
       }
 
       const conflitti = await Prenotazione.findAll({
-        where: { aula_id: aulaId, data },
+        where: {
+          aula_id: aulaId,
+          data,
+          ora_inizio: { [Op.lt]: ora_fine },
+          ora_fine: { [Op.gt]: ora_inizio },
+        },
       });
 
-      const overlap = conflitti.some((p) => {
-        return !(ora_fine <= p.ora_inizio || ora_inizio >= p.ora_fine);
-      });
-
-      if (overlap) {
-        res.status(409).json({ error: "Aula già occupata" });
+      if (conflitti.length > 0) {
+        res.status(409).json({ error: "Conflitto orario", code: "OVERLAP" });
         return;
       }
 
-      const user = req.user;
-      if (!user) {
-        res.status(401).json({ error: "Non autenticato" });
+      if (!req.user) {
+        res.status(401).json({ error: "Non autenticato", code: "UNAUTHORIZED" });
         return;
       }
 
       const nuova = await Prenotazione.create({
-        utente_id: user.id,
+        utente_id: req.user.id,
         aula_id: aulaId,
         data,
         ora_inizio,
@@ -120,63 +135,47 @@ router.post(
         note: note ?? null,
       });
 
-      if (Array.isArray(classi)) {
-        await (nuova as any).setClassi(classi);
+      if (Array.isArray(classi) && classi.length > 0) {
+        await nuova.setClassi(classi);
       }
 
       const result = await Prenotazione.findByPk(nuova.id, {
-        include: [
-          { model: Aula, as: "aula" },
-          { model: Utente, as: "utente" },
-          { model: Classe, as: "classi" },
-        ],
+        include: INCLUDE_FULL,
       });
 
-      res.status(201).json(result);
-    } catch {
-      res.status(500).json({ error: "Errore creazione prenotazione" });
+      res.status(201).json({ data: result });
+    } catch (err) {
+      next(err);
     }
   }
 );
 
-// DELETE prenotazione
 router.delete(
   "/:id",
   authMiddleware,
-  roleMiddleware(["admin", "docente"]),
-  async (req, res) => {
+  roleMiddleware(["docente", "ata", "admin"]),
+  checkOwner,
+  async (req, res, next) => {
     try {
-      const id = Number(req.params.id);
+      const id = parseId(req.params.id);
 
-      if (Number.isNaN(id)) {
-        res.status(400).json({ error: "ID non valido" });
+      if (!id) {
+        res.status(400).json({ error: "ID non valido", code: "INVALID_ID" });
         return;
       }
 
       const prenotazione = await Prenotazione.findByPk(id);
 
       if (!prenotazione) {
-        res.status(404).json({ error: "Prenotazione non trovata" });
-        return;
-      }
-
-      const user = req.user;
-
-      if (!user) {
-        res.status(401).json({ error: "Non autenticato" });
-        return;
-      }
-
-      if (user.ruolo !== "admin" && prenotazione.utente_id !== user.id) {
-        res.status(403).json({ error: "Non autorizzato" });
+        res.status(404).json({ error: "Non trovata", code: "NOT_FOUND" });
         return;
       }
 
       await prenotazione.destroy();
 
       res.json({ message: "Eliminata con successo" });
-    } catch {
-      res.status(500).json({ error: "Errore eliminazione" });
+    } catch (err) {
+      next(err);
     }
   }
 );

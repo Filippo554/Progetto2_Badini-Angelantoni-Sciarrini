@@ -10,45 +10,52 @@ export async function checkOwner(
   try {
     const id = Number(req.params.id);
 
-    // validazione id
-    if (!id || Number.isNaN(id)) {
-      res.status(400).json({ error: "ID prenotazione non valido" });
+    if (!Number.isInteger(id) || id < 1) {
+      res.status(400).json({
+        error: "ID prenotazione non valido",
+        code: "INVALID_ID",
+      });
       return;
     }
 
     const prenotazione = await Prenotazione.findByPk(id);
 
     if (!prenotazione) {
-      res.status(404).json({ error: "Prenotazione non trovata" });
+      res.status(404).json({
+        error: "Prenotazione non trovata",
+        code: "NOT_FOUND",
+      });
       return;
     }
 
-    //utente autenticato
     if (!req.user) {
-      res.status(401).json({ error: "Non autenticato" });
+      res.status(401).json({
+        error: "Non autenticato",
+        code: "UNAUTHORIZED",
+      });
       return;
     }
 
-    // admin
-    if (req.user.ruolo === "admin") {
+    const { user } = req;
+
+    if (user.ruolo === "admin") {
       next();
       return;
     }
 
-    // controllo
-    if (prenotazione.utente_id !== req.user.id) {
+    if (prenotazione.utente_id !== user.id) {
       res.status(403).json({
         error: "Non hai i permessi per questa operazione",
+        code: "FORBIDDEN",
       });
       return;
     }
 
     next();
-  } catch (err) {
-    console.error("checkOwner error:", err);
-
+  } catch {
     res.status(500).json({
-      error: "Errore interno nel controllo dei permessi",
+      error: "Errore interno nel controllo permessi",
+      code: "CHECK_OWNER_ERROR",
     });
   }
 }

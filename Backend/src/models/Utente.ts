@@ -35,8 +35,12 @@ export class Utente extends Model<
           type: DataTypes.STRING(150),
           allowNull: false,
           unique: true,
+          set(value: string) {
+            this.setDataValue("email", value.toLowerCase().trim());
+          },
           validate: {
             isEmail: true,
+            len: [5, 150],
           },
         },
 
@@ -45,6 +49,7 @@ export class Utente extends Model<
           allowNull: false,
           validate: {
             notEmpty: true,
+            len: [2, 100],
           },
         },
 
@@ -53,6 +58,7 @@ export class Utente extends Model<
           allowNull: false,
           validate: {
             notEmpty: true,
+            len: [2, 100],
           },
         },
 
@@ -72,6 +78,12 @@ export class Utente extends Model<
         sequelize,
         tableName: "utente",
         timestamps: false,
+        indexes: [
+          {
+            unique: true,
+            fields: ["email"],
+          },
+        ],
       }
     );
 

@@ -7,6 +7,9 @@ import {
   ForeignKey,
   NonAttribute,
   Sequelize,
+  BelongsToManySetAssociationsMixin,
+  BelongsToManyGetAssociationsMixin,
+  BelongsToManyAddAssociationsMixin,
 } from "sequelize";
 
 import type { Utente } from "./Utente";
@@ -18,22 +21,21 @@ export class Prenotazione extends Model<
   InferCreationAttributes<Prenotazione>
 > {
   declare id: CreationOptional<number>;
-
-  // FK schema.sql
   declare utente_id: ForeignKey<number> | null;
   declare aula_id: ForeignKey<number>;
-
   declare data: string;
   declare ora_inizio: string;
   declare ora_fine: string;
-
   declare note: CreationOptional<string | null>;
   declare created_at: CreationOptional<Date>;
 
-  // associazioni virtuali
   declare utente?: NonAttribute<Utente>;
   declare aula?: NonAttribute<Aula>;
   declare classi?: NonAttribute<Classe[]>;
+
+  declare setClassi: BelongsToManySetAssociationsMixin<Classe, number>;
+  declare getClassi: BelongsToManyGetAssociationsMixin<Classe>;
+  declare addClassi: BelongsToManyAddAssociationsMixin<Classe, number>;
 
   static initModel(sequelize: Sequelize): typeof Prenotazione {
     Prenotazione.init(
@@ -77,6 +79,13 @@ export class Prenotazione extends Model<
         ora_fine: {
           type: DataTypes.TIME,
           allowNull: false,
+          validate: {
+            isAfterStart(this: Prenotazione, value: string) {
+              if (value <= this.ora_inizio) {
+                throw new Error("ora_fine deve essere maggiore di ora_inizio");
+              }
+            },
+          },
         },
 
         note: {
@@ -93,14 +102,6 @@ export class Prenotazione extends Model<
         sequelize,
         tableName: "prenotazione",
         timestamps: false,
-
-        validate: {
-          orarioValido(this: Prenotazione) {
-            if (this.ora_fine <= this.ora_inizio) {
-              throw new Error("ora_fine deve essere maggiore di ora_inizio");
-            }
-          },
-        },
       }
     );
 

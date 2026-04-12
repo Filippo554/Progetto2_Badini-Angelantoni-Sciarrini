@@ -28,6 +28,9 @@ export class Classe extends Model<
         nome: {
           type: DataTypes.STRING(10),
           allowNull: false,
+          set(value: string) {
+            this.setDataValue("nome", value?.trim());
+          },
           validate: {
             len: [1, 10],
           },
@@ -36,12 +39,16 @@ export class Classe extends Model<
         indirizzo: {
           type: DataTypes.STRING(100),
           allowNull: true,
+          set(value: string | null) {
+            this.setDataValue("indirizzo", value ? value.trim() : null);
+          },
         },
 
         anno: {
           type: DataTypes.SMALLINT,
           allowNull: false,
           validate: {
+            isInt: true,
             min: 1,
             max: 5,
           },

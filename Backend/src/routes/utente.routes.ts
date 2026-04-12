@@ -5,7 +5,16 @@ import { roleMiddleware } from "../middleware/role.middleware";
 
 const router = Router();
 
-// GET tutti gli utenti (solo admin)
+function parseId(id: unknown): number | null {
+  const n = Number(id);
+  return Number.isInteger(n) && n > 0 ? n : null;
+}
+
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+// GET tutti utenti (solo admin)
 router.get(
   "/",
   authMiddleware,
@@ -16,7 +25,7 @@ router.get(
         order: [["cognome", "ASC"]],
       });
 
-      res.json(utenti);
+      res.json({ data: utenti });
     } catch {
       res.status(500).json({ error: "Errore recupero utenti" });
     }
@@ -24,31 +33,27 @@ router.get(
 );
 
 // GET utente per ID
-router.get(
-  "/:id",
-  authMiddleware,
-  async (req, res) => {
-    try {
-      const id = Number(req.params.id);
+router.get("/:id", authMiddleware, async (req, res) => {
+  try {
+    const id = parseId(req.params.id);
 
-      if (Number.isNaN(id)) {
-        res.status(400).json({ error: "ID non valido" });
-        return;
-      }
-
-      const utente = await Utente.findByPk(id);
-
-      if (!utente) {
-        res.status(404).json({ error: "Utente non trovato" });
-        return;
-      }
-
-      res.json(utente);
-    } catch {
-      res.status(500).json({ error: "Errore server" });
+    if (!id) {
+      res.status(400).json({ error: "ID non valido" });
+      return;
     }
+
+    const utente = await Utente.findByPk(id);
+
+    if (!utente) {
+      res.status(404).json({ error: "Utente non trovato" });
+      return;
+    }
+
+    res.json({ data: utente });
+  } catch {
+    res.status(500).json({ error: "Errore server" });
   }
-);
+});
 
 // CREATE utente (solo admin)
 router.post(
@@ -64,8 +69,10 @@ router.post(
         return;
       }
 
+      const emailNorm = normalizeEmail(email);
+
       const esistente = await Utente.findOne({
-        where: { email },
+        where: { email: emailNorm },
       });
 
       if (esistente) {
@@ -74,13 +81,13 @@ router.post(
       }
 
       const nuovo = await Utente.create({
-        email: email.trim().toLowerCase(),
+        email: emailNorm,
         nome: nome.trim(),
         cognome: cognome.trim(),
         ruolo: ruolo ?? "studente",
       });
 
-      res.status(201).json(nuovo);
+      res.status(201).json({ data: nuovo });
     } catch {
       res.status(500).json({ error: "Errore creazione utente" });
     }
@@ -94,9 +101,9 @@ router.delete(
   roleMiddleware(["admin"]),
   async (req, res) => {
     try {
-      const id = Number(req.params.id);
+      const id = parseId(req.params.id);
 
-      if (Number.isNaN(id)) {
+      if (!id) {
         res.status(400).json({ error: "ID non valido" });
         return;
       }
@@ -110,7 +117,7 @@ router.delete(
 
       await utente.destroy();
 
-      res.json({ message: "Utente eliminato" });
+      res.json({ message: "Utente eliminato con successo" });
     } catch {
       res.status(500).json({ error: "Errore eliminazione utente" });
     }
