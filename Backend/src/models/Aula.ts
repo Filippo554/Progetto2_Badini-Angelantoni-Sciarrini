@@ -13,7 +13,7 @@ export class Aula extends Model<
 > {
   declare id: CreationOptional<number>;
   declare numero: number;
-  declare capienza: CreationOptional<number | null>;
+  declare capienza: CreationOptional<number>;
   declare descrizione: CreationOptional<string | null>;
   declare piano: CreationOptional<number | null>;
 
@@ -38,7 +38,7 @@ export class Aula extends Model<
 
         capienza: {
           type: DataTypes.SMALLINT,
-          allowNull: true,
+          allowNull: false,
           defaultValue: 30,
         },
 

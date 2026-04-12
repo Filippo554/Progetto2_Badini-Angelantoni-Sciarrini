@@ -4,13 +4,15 @@ import { Aula } from "../models/Aula";
 import { Utente } from "../models/Utente";
 import { Classe } from "../models/Classe";
 
+import { authMiddleware } from "../middleware/auth.middleware";
+import { roleMiddleware } from "../middleware/role.middleware";
+
 const router = Router();
 
-
-// GET TUTTE LE PRENOTAZIONI
-router.get("/", async (req, res) => {
+// GET tutte prenotazioni
+router.get("/", authMiddleware, async (_req, res) => {
   try {
-    const prenotazioni = await Prenotazione.findAll({
+    const data = await Prenotazione.findAll({
       include: [
         { model: Aula, as: "aula" },
         { model: Utente, as: "utente" },
@@ -22,19 +24,23 @@ router.get("/", async (req, res) => {
       ],
     });
 
-    res.json(prenotazioni);
-  } catch (err) {
-    res.status(500).json({
-      message: "Errore recupero prenotazioni",
-      err,
-    });
+    res.json(data);
+  } catch {
+    res.status(500).json({ error: "Errore recupero prenotazioni" });
   }
 });
 
-//GET SINGOLA PRENOTAZIONE
-router.get("/:id", async (req, res) => {
+// GET singola prenotazione
+router.get("/:id", authMiddleware, async (req, res) => {
   try {
-    const prenotazione = await Prenotazione.findByPk(req.params.id, {
+    const id = Number(req.params.id);
+
+    if (Number.isNaN(id)) {
+      res.status(400).json({ error: "ID non valido" });
+      return;
+    }
+
+    const prenotazione = await Prenotazione.findByPk(id, {
       include: [
         { model: Aula, as: "aula" },
         { model: Utente, as: "utente" },
@@ -43,125 +49,136 @@ router.get("/:id", async (req, res) => {
     });
 
     if (!prenotazione) {
-      return res.status(404).json({
-        message: "Prenotazione non trovata",
-      });
+      res.status(404).json({ error: "Prenotazione non trovata" });
+      return;
     }
 
     res.json(prenotazione);
-  } catch (err) {
-    res.status(500).json({
-      message: "Errore server",
-      err,
-    });
+  } catch {
+    res.status(500).json({ error: "Errore server" });
   }
 });
 
+// CREATE prenotazione
+router.post(
+  "/",
+  authMiddleware,
+  roleMiddleware(["docente", "admin", "ata"]),
+  async (req, res) => {
+    try {
+      const { aula_id, data, ora_inizio, ora_fine, note, classi } = req.body;
 
-// CREATE PRENOTAZIONE
-router.post("/", async (req, res) => {
-  try {
-    const {
-      utente_id,
-      aula_id,
-      data,
-      ora_inizio,
-      ora_fine,
-      note,
-      classi,
-    } = req.body;
+      if (!aula_id || !data || !ora_inizio || !ora_fine) {
+        res.status(400).json({ error: "Dati mancanti" });
+        return;
+      }
 
-    // VALIDAZIONE BASE
-    if (!aula_id || !data || !ora_inizio || !ora_fine) {
-      return res.status(400).json({
-        message: "Dati mancanti",
+      if (ora_fine <= ora_inizio) {
+        res.status(400).json({ error: "Orario non valido" });
+        return;
+      }
+
+      const aulaId = Number(aula_id);
+
+      if (Number.isNaN(aulaId)) {
+        res.status(400).json({ error: "aula_id non valido" });
+        return;
+      }
+
+      const aula = await Aula.findByPk(aulaId);
+
+      if (!aula) {
+        res.status(404).json({ error: "Aula non trovata" });
+        return;
+      }
+
+      const conflitti = await Prenotazione.findAll({
+        where: { aula_id: aulaId, data },
       });
-    }
 
-    if (ora_fine <= ora_inizio) {
-      return res.status(400).json({
-        message: "ora_fine deve essere successiva a ora_inizio",
+      const overlap = conflitti.some((p) => {
+        return !(ora_fine <= p.ora_inizio || ora_inizio >= p.ora_fine);
       });
-    }
 
-    // CONTROLLO AULA ESISTE
-    const aula = await Aula.findByPk(aula_id);
-    if (!aula) {
-      return res.status(404).json({
-        message: "Aula non trovata",
+      if (overlap) {
+        res.status(409).json({ error: "Aula già occupata" });
+        return;
+      }
+
+      const user = req.user;
+      if (!user) {
+        res.status(401).json({ error: "Non autenticato" });
+        return;
+      }
+
+      const nuova = await Prenotazione.create({
+        utente_id: user.id,
+        aula_id: aulaId,
+        data,
+        ora_inizio,
+        ora_fine,
+        note: note ?? null,
       });
-    }
 
-    // CONTROLLO CONFLITTI ORARI
-    const prenotazioniEsistenti = await Prenotazione.findAll({
-      where: { aula_id, data },
-    });
+      if (Array.isArray(classi)) {
+        await (nuova as any).setClassi(classi);
+      }
 
-    const conflitto = prenotazioniEsistenti.some((p) => {
-      return !(ora_fine <= p.ora_inizio || ora_inizio >= p.ora_fine);
-    });
-
-    if (conflitto) {
-      return res.status(409).json({
-        message: "Conflitto orario: aula già prenotata",
+      const result = await Prenotazione.findByPk(nuova.id, {
+        include: [
+          { model: Aula, as: "aula" },
+          { model: Utente, as: "utente" },
+          { model: Classe, as: "classi" },
+        ],
       });
+
+      res.status(201).json(result);
+    } catch {
+      res.status(500).json({ error: "Errore creazione prenotazione" });
     }
-
-    // CREAZIONE PRENOTAZIONE
-    const nuovaPrenotazione = await Prenotazione.create({
-      utente_id: utente_id || null,
-      aula_id,
-      data,
-      ora_inizio,
-      ora_fine,
-      note: note || null,
-    });
-
-    // ASSOCIAZIONE CLASSI
-    if (classi && Array.isArray(classi)) {
-      await (nuovaPrenotazione as any).setClassi(classi);
-    }
-
-    const risultato = await Prenotazione.findByPk(nuovaPrenotazione.id, {
-      include: [
-        { model: Aula, as: "aula" },
-        { model: Utente, as: "utente" },
-        { model: Classe, as: "classi" },
-      ],
-    });
-
-    res.status(201).json(risultato);
-  } catch (err) {
-    res.status(500).json({
-      message: "Errore creazione prenotazione",
-      err,
-    });
   }
-});
+);
 
+// DELETE prenotazione
+router.delete(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin", "docente"]),
+  async (req, res) => {
+    try {
+      const id = Number(req.params.id);
 
-//DELETE PRENOTAZIONE
-router.delete("/:id", async (req, res) => {
-  try {
-    const prenotazione = await Prenotazione.findByPk(req.params.id);
+      if (Number.isNaN(id)) {
+        res.status(400).json({ error: "ID non valido" });
+        return;
+      }
 
-    if (!prenotazione) {
-      return res.status(404).json({
-        message: "Prenotazione non trovata",
-      });
+      const prenotazione = await Prenotazione.findByPk(id);
+
+      if (!prenotazione) {
+        res.status(404).json({ error: "Prenotazione non trovata" });
+        return;
+      }
+
+      const user = req.user;
+
+      if (!user) {
+        res.status(401).json({ error: "Non autenticato" });
+        return;
+      }
+
+      if (user.ruolo !== "admin" && prenotazione.utente_id !== user.id) {
+        res.status(403).json({ error: "Non autorizzato" });
+        return;
+      }
+
+      await prenotazione.destroy();
+
+      res.json({ message: "Eliminata con successo" });
+    } catch {
+      res.status(500).json({ error: "Errore eliminazione" });
     }
-
-    await prenotazione.destroy();
-
-    res.json({
-      message: "Prenotazione eliminata con successo",
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Errore eliminazione prenotazione",
-      err,
-    });
   }
-});
+);
 
 export default router;

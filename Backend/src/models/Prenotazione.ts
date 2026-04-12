@@ -19,18 +19,18 @@ export class Prenotazione extends Model<
 > {
   declare id: CreationOptional<number>;
 
-  // FK coerenti con schema.sql
-  declare utente_id: ForeignKey<number>;
+  // FK schema.sql
+  declare utente_id: ForeignKey<number> | null;
   declare aula_id: ForeignKey<number>;
 
   declare data: string;
   declare ora_inizio: string;
   declare ora_fine: string;
-  declare note: CreationOptional<string | null>;
 
+  declare note: CreationOptional<string | null>;
   declare created_at: CreationOptional<Date>;
 
-  // associazioni (virtuali)
+  // associazioni virtuali
   declare utente?: NonAttribute<Utente>;
   declare aula?: NonAttribute<Aula>;
   declare classi?: NonAttribute<Classe[]>;
@@ -93,10 +93,11 @@ export class Prenotazione extends Model<
         sequelize,
         tableName: "prenotazione",
         timestamps: false,
+
         validate: {
           orarioValido(this: Prenotazione) {
             if (this.ora_fine <= this.ora_inizio) {
-              throw new Error("ora_fine deve essere successiva a ora_inizio");
+              throw new Error("ora_fine deve essere maggiore di ora_inizio");
             }
           },
         },

@@ -14,9 +14,11 @@ export class Utente extends Model<
   InferCreationAttributes<Utente>
 > {
   declare id: CreationOptional<number>;
+
   declare email: string;
   declare nome: string;
   declare cognome: string;
+
   declare ruolo: CreationOptional<RuoloUtente>;
   declare attivo: CreationOptional<boolean>;
 
@@ -41,11 +43,17 @@ export class Utente extends Model<
         nome: {
           type: DataTypes.STRING(100),
           allowNull: false,
+          validate: {
+            notEmpty: true,
+          },
         },
 
         cognome: {
           type: DataTypes.STRING(100),
           allowNull: false,
+          validate: {
+            notEmpty: true,
+          },
         },
 
         ruolo: {

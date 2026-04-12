@@ -1,103 +1,120 @@
 import { Router } from "express";
 import { Utente } from "../models/Utente";
+import { authMiddleware } from "../middleware/auth.middleware";
+import { roleMiddleware } from "../middleware/role.middleware";
 
 const router = Router();
 
-// GET TUTTI GLI UTENTI
-
-router.get("/", async (req, res) => {
-  try {
-    const utenti = await Utente.findAll({
-      order: [["cognome", "ASC"]],
-    });
-
-    res.json(utenti);
-  } catch (err) {
-    res.status(500).json({
-      message: "Errore recupero utenti",
-      err,
-    });
-  }
-});
-
-// GET UTENTE SINGOLO
-router.get("/:email", async (req, res) => {
-  try {
-    const utente = await Utente.findByPk(req.params.email);
-
-    if (!utente) {
-      return res.status(404).json({
-        message: "Utente non trovato",
+// GET tutti gli utenti (solo admin)
+router.get(
+  "/",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  async (_req, res) => {
+    try {
+      const utenti = await Utente.findAll({
+        order: [["cognome", "ASC"]],
       });
-    }
 
-    res.json(utente);
-  } catch (err) {
-    res.status(500).json({
-      message: "Errore server",
-      err,
-    });
+      res.json(utenti);
+    } catch {
+      res.status(500).json({ error: "Errore recupero utenti" });
+    }
   }
-});
+);
 
-// CREATE UTENTE
-router.post("/", async (req, res) => {
-  try {
-    const { email, nome, cognome, ruolo } = req.body;
+// GET utente per ID
+router.get(
+  "/:id",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const id = Number(req.params.id);
 
-    if (!email || !nome || !cognome) {
-      return res.status(400).json({
-        message: "Dati mancanti",
-      });
+      if (Number.isNaN(id)) {
+        res.status(400).json({ error: "ID non valido" });
+        return;
+      }
+
+      const utente = await Utente.findByPk(id);
+
+      if (!utente) {
+        res.status(404).json({ error: "Utente non trovato" });
+        return;
+      }
+
+      res.json(utente);
+    } catch {
+      res.status(500).json({ error: "Errore server" });
     }
-
-    const esistente = await Utente.findByPk(email);
-    if (esistente) {
-      return res.status(409).json({
-        message: "Utente già esistente",
-      });
-    }
-
-    const nuovo = await Utente.create({
-      email,
-      nome,
-      cognome,
-      ruolo: ruolo || "studente",
-    });
-
-    res.status(201).json(nuovo);
-  } catch (err) {
-    res.status(500).json({
-      message: "Errore creazione utente",
-      err,
-    });
   }
-});
+);
 
+// CREATE utente (solo admin)
+router.post(
+  "/",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  async (req, res) => {
+    try {
+      const { email, nome, cognome, ruolo } = req.body;
 
-// DELETE UTENTE
+      if (!email || !nome || !cognome) {
+        res.status(400).json({ error: "Dati mancanti" });
+        return;
+      }
 
-router.delete("/:email", async (req, res) => {
-  try {
-    const utente = await Utente.findByPk(req.params.email);
-
-    if (!utente) {
-      return res.status(404).json({
-        message: "Utente non trovato",
+      const esistente = await Utente.findOne({
+        where: { email },
       });
+
+      if (esistente) {
+        res.status(409).json({ error: "Utente già esistente" });
+        return;
+      }
+
+      const nuovo = await Utente.create({
+        email: email.trim().toLowerCase(),
+        nome: nome.trim(),
+        cognome: cognome.trim(),
+        ruolo: ruolo ?? "studente",
+      });
+
+      res.status(201).json(nuovo);
+    } catch {
+      res.status(500).json({ error: "Errore creazione utente" });
     }
-
-    await utente.destroy();
-
-    res.json({
-      message: "Utente eliminato",
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Errore eliminazione utente",
-      err,
-    });
   }
-});
+);
+
+// DELETE utente (solo admin)
+router.delete(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+
+      if (Number.isNaN(id)) {
+        res.status(400).json({ error: "ID non valido" });
+        return;
+      }
+
+      const utente = await Utente.findByPk(id);
+
+      if (!utente) {
+        res.status(404).json({ error: "Utente non trovato" });
+        return;
+      }
+
+      await utente.destroy();
+
+      res.json({ message: "Utente eliminato" });
+    } catch {
+      res.status(500).json({ error: "Errore eliminazione utente" });
+    }
+  }
+);
 
 export default router;

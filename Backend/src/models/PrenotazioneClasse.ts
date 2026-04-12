@@ -11,13 +11,14 @@ export class PrenotazioneClasse extends Model<
   InferAttributes<PrenotazioneClasse>,
   InferCreationAttributes<PrenotazioneClasse>
 > {
-  declare id_prenotazione: ForeignKey<number>;
-  declare id_classe: ForeignKey<number>;
+  // FK coerenti con schema.sql e associations Sequelize
+  declare prenotazione_id: ForeignKey<number>;
+  declare classe_id: ForeignKey<number>;
 
   static initModel(sequelize: Sequelize): typeof PrenotazioneClasse {
     PrenotazioneClasse.init(
       {
-        id_prenotazione: {
+        prenotazione_id: {
           type: DataTypes.INTEGER,
           allowNull: false,
           primaryKey: true,
@@ -27,7 +28,8 @@ export class PrenotazioneClasse extends Model<
           },
           onDelete: "CASCADE",
         },
-        id_classe: {
+
+        classe_id: {
           type: DataTypes.INTEGER,
           allowNull: false,
           primaryKey: true,

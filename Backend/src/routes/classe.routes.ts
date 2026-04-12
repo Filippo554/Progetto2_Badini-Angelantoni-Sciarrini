@@ -1,102 +1,125 @@
 import { Router } from "express";
 import { Classe } from "../models/Classe";
+import { authMiddleware } from "../middleware/auth.middleware";
+import { roleMiddleware } from "../middleware/role.middleware";
 
 const router = Router();
 
-
-// GET TUTTE LE CLASSI
-router.get("/", async (req, res) => {
+// GET tutte le classi
+router.get("/", authMiddleware, async (req, res) => {
   try {
     const classi = await Classe.findAll({
-      order: [["anno", "ASC"]],
+      order: [
+        ["anno", "ASC"],
+        ["nome", "ASC"],
+      ],
     });
 
-    res.json(classi);
-  } catch (err) {
-    res.status(500).json({
-      message: "Errore recupero classi",
-      err,
-    });
+    res.json({ data: classi });
+  } catch {
+    res.status(500).json({ error: "Errore nel recupero delle classi" });
   }
 });
 
-// GET CLASSE SINGOLA
-router.get("/:id", async (req, res) => {
+// GET classe per ID
+router.get("/:id", authMiddleware, async (req, res) => {
   try {
-    const classe = await Classe.findByPk(req.params.id);
+    const id = Number(req.params.id);
+
+    if (Number.isNaN(id)) {
+      res.status(400).json({ error: "ID non valido" });
+      return;
+    }
+
+    const classe = await Classe.findByPk(id);
 
     if (!classe) {
-      return res.status(404).json({
-        message: "Classe non trovata",
-      });
+      res.status(404).json({ error: "Classe non trovata" });
+      return;
     }
 
-    res.json(classe);
-  } catch (err) {
-    res.status(500).json({
-      message: "Errore server",
-      err,
-    });
+    res.json({ data: classe });
+  } catch {
+    res.status(500).json({ error: "Errore server" });
   }
 });
 
+// CREATE classe (solo admin)
+router.post(
+  "/",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  async (req, res) => {
+    try {
+      const { nome, indirizzo, anno } = req.body;
 
-// CREATE CLASSE
-router.post("/", async (req, res) => {
-  try {
-    const { nome, indirizzo, anno } = req.body;
+      if (!nome || !indirizzo || anno === undefined) {
+        res.status(400).json({ error: "Dati mancanti" });
+        return;
+      }
 
-    // VALIDAZIONE BASE
-    if (!nome || !indirizzo || !anno) {
-      return res.status(400).json({
-        message: "Dati mancanti",
+      const annoNum = Number(anno);
+
+      if (Number.isNaN(annoNum)) {
+        res.status(400).json({ error: "Anno non valido" });
+        return;
+      }
+
+      if (annoNum < 1 || annoNum > 5) {
+        res.status(400).json({ error: "Anno deve essere tra 1 e 5" });
+        return;
+      }
+
+      const esistente = await Classe.findOne({
+        where: { nome: nome.trim(), anno: annoNum },
       });
-    }
 
-    if (anno < 1 || anno > 5) {
-      return res.status(400).json({
-        message: "Anno deve essere tra 1 e 5",
+      if (esistente) {
+        res.status(409).json({ error: "Classe già esistente" });
+        return;
+      }
+
+      const nuovaClasse = await Classe.create({
+        nome: nome.trim(),
+        indirizzo: indirizzo.trim(),
+        anno: annoNum,
       });
+
+      res.status(201).json({ data: nuovaClasse });
+    } catch {
+      res.status(500).json({ error: "Errore creazione classe" });
     }
-
-    const nuovaClasse = await Classe.create({
-      nome,
-      indirizzo,
-      anno,
-    });
-
-    res.status(201).json(nuovaClasse);
-  } catch (err) {
-    res.status(500).json({
-      message: "Errore creazione classe",
-      err,
-    });
   }
-});
+);
 
+// DELETE classe (solo admin)
+router.delete(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  async (req, res) => {
+    try {
+      const id = Number(req.params.id);
 
-// DELETE CLASSE
-router.delete("/:id", async (req, res) => {
-  try {
-    const classe = await Classe.findByPk(req.params.id);
+      if (Number.isNaN(id)) {
+        res.status(400).json({ error: "ID non valido" });
+        return;
+      }
 
-    if (!classe) {
-      return res.status(404).json({
-        message: "Classe non trovata",
-      });
+      const classe = await Classe.findByPk(id);
+
+      if (!classe) {
+        res.status(404).json({ error: "Classe non trovata" });
+        return;
+      }
+
+      await classe.destroy();
+
+      res.json({ message: "Classe eliminata con successo" });
+    } catch {
+      res.status(500).json({ error: "Errore eliminazione classe" });
     }
-
-    await classe.destroy();
-
-    res.json({
-      message: "Classe eliminata con successo",
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Errore eliminazione classe",
-      err,
-    });
   }
-});
+);
 
 export default router;

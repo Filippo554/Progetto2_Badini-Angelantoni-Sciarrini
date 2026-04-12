@@ -1,56 +1,108 @@
-import { sequelize } from "../db/database";
+import {
+  Model,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  CreationOptional,
+  ForeignKey,
+  NonAttribute,
+  Sequelize,
+} from "sequelize";
 
-import { Utente } from "./Utente";
-import { Aula } from "./Aula";
-import { Classe } from "./Classe";
-import { Prenotazione } from "./Prenotazione";
-import { PrenotazioneClasse } from "./PrenotazioneClasse";
+import type { Utente } from "./Utente";
+import type { Aula } from "./Aula";
+import type { Classe } from "./Classe";
 
-Utente.initModel(sequelize);
-Aula.initModel(sequelize);
-Classe.initModel(sequelize);
-Prenotazione.initModel(sequelize);
-PrenotazioneClasse.initModel(sequelize);
+export class Prenotazione extends Model<
+  InferAttributes<Prenotazione>,
+  InferCreationAttributes<Prenotazione>
+> {
+  declare id: CreationOptional<number>;
 
-Utente.hasMany(Prenotazione, {
-  foreignKey: "utente_id",
-  as: "prenotazioni",
-});
+  // FK coerenti con schema.sql
+  declare utente_id: ForeignKey<number>;
+  declare aula_id: ForeignKey<number>;
 
-Prenotazione.belongsTo(Utente, {
-  foreignKey: "utente_id",
-  as: "utente",
-});
+  declare data: string;
+  declare ora_inizio: string;
+  declare ora_fine: string;
+  declare note: CreationOptional<string | null>;
 
-Aula.hasMany(Prenotazione, {
-  foreignKey: "aula_id",
-  as: "prenotazioni",
-});
+  declare created_at: CreationOptional<Date>;
 
-Prenotazione.belongsTo(Aula, {
-  foreignKey: "aula_id",
-  as: "aula",
-});
+  // associazioni (virtuali)
+  declare utente?: NonAttribute<Utente>;
+  declare aula?: NonAttribute<Aula>;
+  declare classi?: NonAttribute<Classe[]>;
 
-Prenotazione.belongsToMany(Classe, {
-  through: PrenotazioneClasse,
-  foreignKey: "prenotazione_id",
-  otherKey: "classe_id",
-  as: "classi",
-});
+  static initModel(sequelize: Sequelize): typeof Prenotazione {
+    Prenotazione.init(
+      {
+        id: {
+          type: DataTypes.INTEGER,
+          primaryKey: true,
+          autoIncrement: true,
+        },
 
-Classe.belongsToMany(Prenotazione, {
-  through: PrenotazioneClasse,
-  foreignKey: "classe_id",
-  otherKey: "prenotazione_id",
-  as: "prenotazioni",
-});
+        utente_id: {
+          type: DataTypes.INTEGER,
+          allowNull: true,
+          references: {
+            model: "utente",
+            key: "id",
+          },
+          onDelete: "SET NULL",
+        },
 
-export {
-  sequelize,
-  Utente,
-  Aula,
-  Classe,
-  Prenotazione,
-  PrenotazioneClasse,
-};
+        aula_id: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+            model: "aula",
+            key: "id",
+          },
+          onDelete: "RESTRICT",
+        },
+
+        data: {
+          type: DataTypes.DATEONLY,
+          allowNull: false,
+        },
+
+        ora_inizio: {
+          type: DataTypes.TIME,
+          allowNull: false,
+        },
+
+        ora_fine: {
+          type: DataTypes.TIME,
+          allowNull: false,
+        },
+
+        note: {
+          type: DataTypes.TEXT,
+          allowNull: true,
+        },
+
+        created_at: {
+          type: DataTypes.DATE,
+          defaultValue: DataTypes.NOW,
+        },
+      },
+      {
+        sequelize,
+        tableName: "prenotazione",
+        timestamps: false,
+        validate: {
+          orarioValido(this: Prenotazione) {
+            if (this.ora_fine <= this.ora_inizio) {
+              throw new Error("ora_fine deve essere successiva a ora_inizio");
+            }
+          },
+        },
+      }
+    );
+
+    return Prenotazione;
+  }
+}

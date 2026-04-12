@@ -14,20 +14,23 @@ export class Classe extends Model<
   declare id: CreationOptional<number>;
   declare nome: string;
   declare indirizzo: CreationOptional<string | null>;
-  declare anno: CreationOptional<number | null>;
+  declare anno: number;
 
   static initModel(sequelize: Sequelize): typeof Classe {
     Classe.init(
       {
         id: {
           type: DataTypes.INTEGER,
-          autoIncrement: true,
           primaryKey: true,
+          autoIncrement: true,
         },
 
         nome: {
           type: DataTypes.STRING(10),
           allowNull: false,
+          validate: {
+            len: [1, 10],
+          },
         },
 
         indirizzo: {
@@ -37,7 +40,7 @@ export class Classe extends Model<
 
         anno: {
           type: DataTypes.SMALLINT,
-          allowNull: true,
+          allowNull: false,
           validate: {
             min: 1,
             max: 5,
