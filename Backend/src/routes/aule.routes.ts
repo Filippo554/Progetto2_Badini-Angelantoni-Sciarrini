@@ -1,45 +1,112 @@
 import { Router } from "express";
-import { aule } from "../data/aule";
+import { Aula } from "../models/Aula";
 
 const router = Router();
 
-// GET
-router.get("/", (req, res) => {
-  res.json(aule);
+// GET TUTTE LE AULE
+router.get("/", async (req, res) => {
+  try {
+    const aule = await Aula.findAll({
+      order: [["numero", "ASC"]],
+    });
+
+    res.json(aule);
+  } catch (err) {
+    res.status(500).json({
+      message: "Errore nel recupero delle aule",
+      err,
+    });
+  }
 });
 
-// POST
-router.post("/", (req, res) => {
-  const { nome, capienza } = req.body;
+// GET AULA SINGOLA
+router.get("/:id", async (req, res) => {
+  try {
+    const aula = await Aula.findByPk(req.params.id);
 
-  if (!nome || !capienza) {
-    return res.status(400).json({ message: "Dati mancanti" });
+    if (!aula) {
+      return res.status(404).json({
+        message: "Aula non trovata",
+      });
+    }
+
+    res.json(aula);
+  } catch (err) {
+    res.status(500).json({
+      message: "Errore server",
+      err,
+    });
   }
-
-  const nuovaAula = {
-    id: Date.now(),
-    nome,
-    capienza: Number(capienza)
-  };
-
-  aule.push(nuovaAula);
-
-  res.status(201).json(nuovaAula);
 });
 
-// DELETE
-router.delete("/:id", (req, res) => {
-  const id = Number(req.params.id);
+// CREATE AULA
+router.post("/", async (req, res) => {
+  try {
+    const { numero, capienza, descrizione, piano } = req.body;
 
-  const index = aule.findIndex(a => a.id === id);
+    // VALIDAZIONE BASE
+    if (!numero) {
+      return res.status(400).json({
+        message: "Numero aula obbligatorio",
+      });
+    }
 
-  if (index === -1) {
-    return res.status(404).json({ message: "Aula non trovata" });
+    if (numero < 1 || numero > 119) {
+      return res.status(400).json({
+        message: "Numero aula deve essere tra 1 e 119",
+      });
+    }
+
+    // CONTROLLO DUPLICATI
+    const esistente = await Aula.findOne({
+      where: { numero },
+    });
+
+    if (esistente) {
+      return res.status(409).json({
+        message: "Aula già esistente",
+      });
+    }
+
+    // CREAZIONE
+    const nuovaAula = await Aula.create({
+      numero,
+      capienza: capienza || 30,
+      descrizione: descrizione || null,
+      piano: piano || null,
+    });
+
+    res.status(201).json(nuovaAula);
+  } catch (err) {
+    res.status(500).json({
+      message: "Errore creazione aula",
+      err,
+    });
   }
+});
 
-  aule.splice(index, 1);
+// DELETE AULA
+router.delete("/:id", async (req, res) => {
+  try {
+    const aula = await Aula.findByPk(req.params.id);
 
-  res.json({ message: "Aula eliminata" });
+    if (!aula) {
+      return res.status(404).json({
+        message: "Aula non trovata",
+      });
+    }
+
+    await aula.destroy();
+
+    res.json({
+      message: "Aula eliminata con successo",
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Errore eliminazione aula",
+      err,
+    });
+  }
 });
 
 export default router;
