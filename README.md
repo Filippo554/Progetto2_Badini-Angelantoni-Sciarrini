@@ -1,142 +1,235 @@
-# Progetto2 - Badini, Angelantoni, Sciarrini
+# 📚 Progetto2 - Badini, Angelantoni, Sciarrini
 
 ## 📌 Descrizione
-Applicazione web full-stack sviluppata a scopo didattico.
-Il progetto è strutturato in tre parti principali:
-* Frontend (Angular)
-* Backend (Node.js + Express)
-* Database (PostgreSQL)
+
+Applicazione web full-stack sviluppata a scopo didattico per la gestione delle **prenotazioni delle aule scolastiche**.
+
+Il sistema permette di:
+
+* visualizzare le aule disponibili
+* creare e gestire prenotazioni
+* associare classi alle prenotazioni
+* gestire utenti con ruoli differenti (studente, docente, ATA, admin)
+* applicare controlli di sicurezza e autorizzazione
+
+Il progetto è composto da:
+
+* **Frontend** (Angular)
+* **Backend** (Node.js + Express + TypeScript)
+* **Database** (MySQL)
 
 ---
 
 ## 🧱 Struttura del progetto
 
 ### 📁 Frontend
-* `Frontend/` → applicazione Angular (SPA, Client-Side Rendering)
+
+Cartella: `Frontend/`
+
+* Applicazione Angular (SPA)
+* Rendering lato client (CSR)
+* Comunicazione con backend tramite API REST
 
 ---
 
 ### 📁 Backend
-* `Backend/`
-  * `src/`
-    * `index.ts` → punto di avvio del server
-    * `db/` → configurazione connessione al database
-    * `routes/` → definizione degli endpoint API
-    * `services/` → logica di business
-    * `repositories/` → gestione query database
-    * `models/` → interfacce e strutture dati
-  * `.env` → variabili d'ambiente
-  * `package.json`
-  * `tsconfig.json`
-  * `node_modules/`
 
-Il backend segue un'architettura a livelli:
-* **Routes → Services → Repositories → Database**
+Cartella: `Backend/`
+
+Struttura principale:
+
+* `src/`
+
+  * `index.ts` → avvio server Express
+  * `db/` → configurazione database (Sequelize)
+  * `models/` → modelli ORM
+  * `routes/` → endpoint API
+  * `middleware/` → autenticazione e sicurezza
+  * `types/` → estensioni TypeScript
+
+Architettura adottata:
+
+```id="arch1"
+Routes → Middleware → Models → Database
+```
 
 ---
 
 ### 📁 Database
-* `Database/`
-  * `script/`
-    * `create_db.sql` → script SQL DDL (in sviluppo)
+
+Cartella: `Database/script/`
+
+Contiene gli script SQL:
+
+* `schema.sql` → creazione tabelle (DDL)
+* `seed.sql` → dati iniziali
+* `reset.sql` → reset completo database
 
 ---
 
 ## ⚙️ Tecnologie utilizzate
 
 ### Frontend
-* Angular (SPA, CSR)
+
+* Angular
 * TypeScript
 * HTML / CSS
 
 ### Backend
-* Node.js + Express
+
+* Node.js
+* Express
 * TypeScript
+* Sequelize (ORM)
 
 ### Database
-* PostgreSQL
+
+* MySQL
+* MySQL Workbench / phpMyAdmin
+
+---
+
+## 🔐 Sicurezza
+
+Il backend implementa:
+
+* Autenticazione tramite **JWT**
+* Middleware:
+
+  * `authMiddleware` → verifica token
+  * `roleMiddleware` → controllo ruoli
+  * `checkOwner` → verifica proprietà delle risorse
+* Gestione centralizzata degli errori
 
 ---
 
 ## 🚀 Avvio del progetto
 
-### Frontend
-```bash
-cd Frontend
-npm install
-ng serve
+### ▶️ 1. Database (MySQL)
+
+1. Avviare MySQL
+2. Aprire MySQL Workbench (o phpMyAdmin)
+3. Creare un database:
+
+```sql id="db1"
+CREATE DATABASE prenotazione_aule;
 ```
-Aprire: http://localhost:4200/
+
+4. Selezionare il database ed eseguire:
+
+```sql id="db2"
+USE prenotazione_aule;
+```
+
+5. Eseguire gli script nell’ordine:
+
+```sql id="db3"
+reset.sql
+schema.sql
+seed.sql
+```
 
 ---
 
-### Backend
-```bash
+### ▶️ 2. Backend
+
+```bash id="be1"
 cd Backend
 npm install
 npm run dev
 ```
 
----
+Server disponibile su:
 
-## 🗄️ Setup Database (PostgreSQL)
-
-Per eseguire correttamente il progetto è necessario installare PostgreSQL.
-
-### 🔧 Installazione
-Scaricare PostgreSQL dal sito ufficiale:
-👉 https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
-
-Durante l'installazione:
-* Annotare username e password
-* Assicurarsi che il server PostgreSQL sia in esecuzione
-
----
-
-### 🛠️ pgAdmin 4
-Per la gestione del database è consigliato utilizzare **pgAdmin 4**, incluso nell'installazione di PostgreSQL.
-
----
-
-### ▶️ Avvio database
-1. Avviare PostgreSQL
-2. Aprire pgAdmin 4
-3. Connettersi al server locale
-
----
-
-### 📜 Script SQL
-Gli script del database si trovano in:
-```bash
-Database/script/
+```id="be2"
+http://localhost:3000
 ```
-* `create_db.sql` → creazione delle tabelle (DDL)
+
+Health check:
+
+```id="be3"
+http://localhost:3000/
+```
 
 ---
 
-### ⚠️ Nota
-Attualmente il backend è configurato ma non ancora collegato al database.
-La configurazione della connessione sarà definita nelle fasi successive dello sviluppo.
+### ▶️ 3. Frontend
+
+```bash id="fe1"
+cd Frontend
+npm install
+ng serve
+```
+
+Applicazione disponibile su:
+
+```id="fe2"
+http://localhost:4200
+```
 
 ---
 
-## 🌐 Rendering
+## 🔗 Configurazione ambiente
 
-Il frontend è configurato come **SPA (Single Page Application)** con rendering interamente lato client (CSR).
-Il Server-Side Rendering (SSR) è stato rimosso in quanto non necessario per questo tipo di applicazione.
+File `.env` (Backend):
+
+```env id="env1"
+PORT=3000
+
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=prenotazione_aule
+DB_USER=root
+DB_PASSWORD=password
+
+JWT_SECRET=INSERIRE_UN_SECRET_SICURO
+
+FRONTEND_URL=http://localhost:4200
+```
+
+---
+
+## 📊 Funzionalità principali
+
+* CRUD Aule
+* CRUD Classi
+* CRUD Prenotazioni
+* Relazione N:M Prenotazioni ↔ Classi
+* Controllo sovrapposizione prenotazioni
+* Gestione utenti e ruoli
+* Protezione API con JWT
+
+---
+
+## 📌 Stato del progetto
+
+✔ Backend completo e strutturato
+✔ Database progettato e funzionante
+✔ API REST protette
+✔ Frontend configurato
+
+🚧 Miglioramenti possibili:
+
+* login completo (JWT / OAuth)
+* documentazione API
+* test automatici
 
 ---
 
 ## 👥 Autori
+
 * Badini
 * Angelantoni
 * Sciarrini
 
 ---
 
-## 📌 Stato del progetto
-In sviluppo 🚧
-* Architettura full-stack definita
-* Backend strutturato a livelli
-* Frontend: SSR rimosso, SPA configurata
-* Database: schema progettato, DDL in sviluppo
+## 🏆 Note finali
+
+Il progetto è stato sviluppato seguendo buone pratiche di progettazione:
+
+* separazione delle responsabilità
+* validazione dei dati
+* sicurezza delle API
+
+Struttura modulare e facilmente estendibile.
