@@ -1,45 +1,124 @@
 import { Router } from "express";
-import { aule } from "../data/aule";
+import { Aula } from "../models/Aula";
+import { authMiddleware } from "../middleware/auth.middleware";
+import { roleMiddleware } from "../middleware/role.middleware";
 
 const router = Router();
 
-// GET
-router.get("/", (req, res) => {
-  res.json(aule);
-});
+function isValidId(id: unknown): id is number {
+  return typeof id === "number" && Number.isInteger(id) && id > 0;
+}
 
-// POST
-router.post("/", (req, res) => {
-  const { nome, capienza } = req.body;
+// GET tutte le aule
+router.get("/", authMiddleware, async (_req, res) => {
+  try {
+    const aule = await Aula.findAll({
+      order: [["numero", "ASC"]],
+    });
 
-  if (!nome || !capienza) {
-    return res.status(400).json({ message: "Dati mancanti" });
+    res.json({ data: aule });
+  } catch {
+    res.status(500).json({ error: "Errore nel recupero delle aule" });
   }
-
-  const nuovaAula = {
-    id: Date.now(),
-    nome,
-    capienza: Number(capienza)
-  };
-
-  aule.push(nuovaAula);
-
-  res.status(201).json(nuovaAula);
 });
 
-// DELETE
-router.delete("/:id", (req, res) => {
-  const id = Number(req.params.id);
+// GET aula per ID
+router.get("/:id", authMiddleware, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
 
-  const index = aule.findIndex(a => a.id === id);
+    if (!isValidId(id)) {
+      res.status(400).json({ error: "ID aula non valido" });
+      return;
+    }
 
-  if (index === -1) {
-    return res.status(404).json({ message: "Aula non trovata" });
+    const aula = await Aula.findByPk(id);
+
+    if (!aula) {
+      res.status(404).json({ error: "Aula non trovata" });
+      return;
+    }
+
+    res.json({ data: aula });
+  } catch {
+    res.status(500).json({ error: "Errore server" });
   }
-
-  aule.splice(index, 1);
-
-  res.json({ message: "Aula eliminata" });
 });
+
+// CREATE aula (solo admin)
+router.post(
+  "/",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  async (req, res) => {
+    try {
+      const { numero, capienza, descrizione, piano } = req.body;
+
+      const numeroAula = Number(numero);
+
+      if (!Number.isInteger(numeroAula)) {
+        res.status(400).json({ error: "Numero aula non valido" });
+        return;
+      }
+
+      if (numeroAula < 1 || numeroAula > 119) {
+        res.status(400).json({
+          error: "Numero aula deve essere tra 1 e 119",
+        });
+        return;
+      }
+
+      const esistente = await Aula.findOne({
+        where: { numero: numeroAula },
+      });
+
+      if (esistente) {
+        res.status(409).json({ error: "Aula già esistente" });
+        return;
+      }
+
+      const nuovaAula = await Aula.create({
+        numero: numeroAula,
+        capienza: capienza ?? 30,
+        descrizione: descrizione ?? null,
+        piano: piano ?? null,
+      });
+
+      res.status(201).json({ data: nuovaAula });
+    } catch {
+      res.status(500).json({ error: "Errore creazione aula" });
+    }
+  }
+);
+
+// DELETE aula (solo admin)
+router.delete(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+
+      if (!isValidId(id)) {
+        res.status(400).json({ error: "ID aula non valido" });
+        return;
+      }
+
+      const aula = await Aula.findByPk(id);
+
+      if (!aula) {
+        res.status(404).json({ error: "Aula non trovata" });
+        return;
+      }
+
+      await aula.destroy();
+
+      res.json({ message: "Aula eliminata con successo" });
+    } catch {
+      res.status(500).json({ error: "Errore eliminazione aula" });
+    }
+  }
+);
 
 export default router;
