@@ -1,0 +1,46 @@
+import { Component, AfterViewInit, ElementRef, ViewChild } from "@angular/core";
+
+declare const google: any;
+
+@Component({
+    selector: 'app-google-button',
+    template: `<div #googleBtn></div>`,
+    styleUrl: './google_button.css',
+})
+export class GoogleButtonComponent implements AfterViewInit {
+
+    @ViewChild('googleBtn') googleBtn!: ElementRef;
+
+    ngAfterViewInit() {
+        const isDark = document.documentElement.classList.contains('dark');
+
+        google.accounts.id.initialize({
+            client_id: 'GOOGLE CLIENT ID',
+            callback: (response: any) => {
+                const credential = response.credential;
+
+                fetch('http://localhost:3000/api/v1/auth/google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log('Token JWT:', data.token);
+                    console.log('Utente:', data.utente);
+                })
+                .catch(err => console.error('Errore login:', err));
+            }
+        });
+
+        google.accounts.id.renderButton(
+            this.googleBtn.nativeElement,
+            {
+                theme: isDark ? 'filled_black' : 'outline',
+                size: 'large',
+                shape: 'pill',
+                width: 400,
+            }
+        );
+    }
+}

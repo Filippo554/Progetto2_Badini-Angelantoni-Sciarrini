@@ -1,0 +1,8 @@
+
+div {
+    position: absolute;
+    display: block;
+    top: 346px;
+    left: 50%;
+    transform: translateX(-50%);
+}

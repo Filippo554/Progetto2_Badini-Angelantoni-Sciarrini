@@ -1,14 +1,14 @@
-import {Component} from '@angular/core';
-import { OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { HeaderComponent } from '../../shared/components/header/header';
+import { Page } from '../../shared/components/page/page';
 
 @Component({
     selector: 'app-error',
     templateUrl: './error.html',
     styleUrl: './error.css',
-    imports: [HeaderComponent],
+    imports: [Page, HeaderComponent],
 })
 export class Error implements OnInit {
     code = '';
