@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { Op } from "sequelize";
+import { Op, WhereOptions } from "sequelize";
 
 import { Prenotazione } from "../models/Prenotazione";
 import { Aula } from "../models/Aula";
 import { Utente } from "../models/Utente";
 import { Classe } from "../models/Classe";
+import { PrenotazioneClasse } from "../models/PrenotazioneClasse";
 
 import { authMiddleware, AuthRequest } from "../middleware/auth.middleware";
 import { roleMiddleware } from "../middleware/role.middleware";
@@ -27,17 +28,84 @@ function isTimeValid(t: string): boolean {
   return /^([01]\d|2[0-3]):[0-5]\d$/.test(t);
 }
 
-router.get("/", authMiddleware, async (_req, res, next) => {
+function getWeekRange(dateStr: string): { lunedi: string; domenica: string } | null {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return null;
+  const day = d.getDay();
+  const diffToMonday = (day === 0 ? -6 : 1 - day);
+  const lunedi = new Date(d);
+  lunedi.setDate(d.getDate() + diffToMonday);
+  const domenica = new Date(lunedi);
+  domenica.setDate(lunedi.getDate() + 6);
+  const fmt = (x: Date): string => x.toISOString().split("T")[0] ?? "";
+  return { lunedi: fmt(lunedi), domenica: fmt(domenica) };
+}
+
+router.get("/", authMiddleware, async (req, res, next) => {
   try {
-    const data = await Prenotazione.findAll({
-      include: INCLUDE_FULL,
+    const { data, settimana, aula_id, classe_id } = req.query;
+
+    const where: WhereOptions = {};
+
+    if (data) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(data as string)) {
+        res.status(400).json({ error: "Parametro 'data' non valido (YYYY-MM-DD)", code: "INVALID_DATE" });
+        return;
+      }
+      where["data"] = data;
+    } else if (settimana) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(settimana as string)) {
+        res.status(400).json({ error: "Parametro 'settimana' non valido (YYYY-MM-DD)", code: "INVALID_DATE" });
+        return;
+      }
+      const range = getWeekRange(settimana as string);
+      if (!range) {
+        res.status(400).json({ error: "Data settimana non valida", code: "INVALID_DATE" });
+        return;
+      }
+      where["data"] = { [Op.between]: [range.lunedi, range.domenica] as [string, string] };
+    }
+
+    if (aula_id) {
+      const aulaIdNum = parseId(aula_id);
+      if (!aulaIdNum) {
+        res.status(400).json({ error: "Parametro 'aula_id' non valido", code: "INVALID_ID" });
+        return;
+      }
+      where["aula_id"] = aulaIdNum;
+    }
+
+    const includeClassi = classe_id
+      ? {
+        model: Classe,
+        as: "classi",
+        required: true,
+        through: {
+          model: PrenotazioneClasse,
+          where: { classe_id: parseId(classe_id) },
+        },
+      }
+      : { model: Classe, as: "classi" };
+
+    if (classe_id && !parseId(classe_id)) {
+      res.status(400).json({ error: "Parametro 'classe_id' non valido", code: "INVALID_ID" });
+      return;
+    }
+
+    const prenotazioni = await Prenotazione.findAll({
+      where,
+      include: [
+        { model: Aula, as: "aula" },
+        { model: Utente, as: "utente", attributes: ["id", "nome", "cognome", "email"] },
+        includeClassi,
+      ],
       order: [
         ["data", "ASC"],
         ["ora_inizio", "ASC"],
       ],
     });
 
-    res.json({ data });
+    res.json({ data: prenotazioni });
   } catch (err) {
     next(err);
   }
@@ -117,7 +185,7 @@ router.post(
       });
 
       if (conflitti.length > 0) {
-        res.status(409).json({ error: "Conflitto orario", code: "OVERLAP" });
+        res.status(409).json({ error: "Conflitto orario: aula già prenotata in questa fascia", code: "OVERLAP" });
         return;
       }
 

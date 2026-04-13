@@ -12,6 +12,7 @@ import auleRoutes from "./routes/aule.routes";
 import prenotazioniRoutes from "./routes/prenotazioni.routes";
 import classiRoutes from "./routes/classe.routes";
 import utentiRoutes from "./routes/utente.routes";
+import authRoutes from "./routes/auth.routes";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(
 app.use(express.json());
 
 // registrazione routes
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/aule", auleRoutes);
 app.use("/api/v1/prenotazioni", prenotazioniRoutes);
 app.use("/api/v1/classi", classiRoutes);
