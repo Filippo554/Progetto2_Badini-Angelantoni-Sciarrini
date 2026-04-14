@@ -1,3 +1,48 @@
 <app-component-page>
     <app-component-header />
+    <form action="" [formGroup]="prenotationForm" (submit)="handleSubmit()">
+        <label>book</label>
+        <section>
+            <label>classes</label>
+            <input
+                type="text"
+                placeholder="cerca classe..."
+                [(ngModel)]="search"
+                [ngModelOptions]="{standalone: true}"
+            >
+            <div class="class-list">
+                @for (class of filteredClasses; track class.c) {
+                    <label class="checkbox-item">
+                        <input
+                            type="checkbox"
+                            [checked]="isSelected(class.c)"
+                            (change)="toggleClass(class.c)"
+                        >
+                        {{ class.c }}
+                    </label>
+                }
+            </div>
+        </section>
+        <section>
+            <label>room</label>
+            <select formControlName="room">
+                @for (room of rooms; track room.n) {
+                    <option value="{{room.n}}">{{room.n}}</option>
+                }
+            </select>
+        </section>
+        <section>
+            <label>data</label>
+            <input formControlName="date" type="date">
+        </section>
+        <section>
+            <label>from</label>
+            <input formControlName="from" type="time">
+            <label>to</label>
+            <input formControlName="to" type="time">
+        </section>
+        <section>
+            <input type="submit" [disabled]="!prenotationForm.valid" value="book">
+        </section>
+    </form>
 </app-component-page>
