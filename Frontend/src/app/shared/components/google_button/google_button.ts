@@ -1,4 +1,6 @@
-import { Component, AfterViewInit, ElementRef, ViewChild } from "@angular/core";
+import { Component, AfterViewInit, ElementRef, ViewChild, inject } from "@angular/core";
+
+import { SessionService } from "../../../../core/services/session.service";
 
 declare const google: any;
 
@@ -9,13 +11,15 @@ declare const google: any;
 })
 export class GoogleButtonComponent implements AfterViewInit {
 
+    sessionService = inject(SessionService);
+
     @ViewChild('googleBtn') googleBtn!: ElementRef;
 
     ngAfterViewInit() {
         const isDark = document.documentElement.classList.contains('dark');
 
         google.accounts.id.initialize({
-            client_id: 'GOOGLE CLIENT ID',
+            client_id: this.sessionService.get_client_id(),
             callback: (response: any) => {
                 const credential = response.credential;
 

@@ -1,3 +1,24 @@
 <app-component-page>
     <app-component-header />
+    <table>
+        <thead>
+            <tr>
+                <td>
+                    <span>
+                        <button (click)="previous()"><</button><p>{{days[day_id].date}}</p><button (click)="next()">></button>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <th>{{days[day_id].day}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (p of prenotations; track p.day_id) {
+                @if (p.day_id === day_id) {
+                    <tr><td>{{p.hours}}</td><td>{{p.class}}</td><td>{{p.room}}</td></tr>
+                }
+            }
+        </tbody>
+    </table>
 </app-component-page>
