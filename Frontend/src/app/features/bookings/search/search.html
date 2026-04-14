@@ -1,3 +1,44 @@
 <app-component-page>
     <app-component-header />
+        <table>
+        <thead>
+            <tr>
+                <th>search</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (p of prenotations; track p.id) {
+                <tr><td>{{p.hours}}</td><td>{{p.class}}</td><td>{{p.room}}</td></tr>
+            }
+        </tbody>
+    </table>
+    <form>
+        <label>filters</label>
+        <span>
+            <section>
+                <label>class</label>
+                <select>
+                    @for (c of classes; track c.c) {
+                        <option value="{{c.c}}">{{c.c}}</option>
+                    }
+                </select>
+            </section>
+            <section>
+                <label>room</label>
+                <select>
+                    @for (r of rooms; track r.n) {
+                        <option value="{{r.n}}">{{r.n}}</option>
+                    }
+                </select>
+            </section>
+            <section>
+                <label>hours</label>
+                <span>
+                    <input type="time">
+                    <input type="time">
+                </span>
+            </section>
+            <input type="submit">
+        </span>
+    </form>
 </app-component-page>

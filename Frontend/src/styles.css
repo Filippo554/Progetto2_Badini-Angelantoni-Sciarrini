@@ -38,3 +38,12 @@
 * {
     transition: 0.2s;
 }
+:root input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: none;
+}
+
+:root.dark input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+

@@ -1,0 +1,95 @@
+form {
+    position: relative;
+    display: block;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: max-content;
+    background-color: var(--box-bg-color);
+    border: solid var(--border-color) 1px;
+    border-radius: 10px;
+}
+form > label {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    padding: 10px 0;
+    border-bottom: solid var(--border-color) 1px;
+    font-size: 25px;
+    font-family: Calibri;
+    text-align: center;
+    background-color: var(--marked-box-bg-color);
+    color: var(--color);
+    border-radius: 10px 10px 0 0;
+}
+section {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 500px;
+    margin-bottom: 20px;
+}
+section > span {
+    position: relative;
+    display: block;
+    flex: 1;
+    height: 100%;
+}
+section > span:nth-child(2) {
+    border-left: solid var(--border-color) 1px;
+}
+section > span > section {
+    position: relative;
+    display: block;
+    width: auto;
+    margin: 20px;
+    background-color: var(--marked-box-bg-color);
+    border: solid var(--border-color) 1px;
+    border-radius: 10px;
+    height: 70px;
+}
+section > span > section > label {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    font-family: Calibri;
+    font-size: 25px;
+    text-align: center;
+    color: var(--color);
+    border-bottom: solid var(--border-color) 1px;
+}
+section > span > section > span {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    font-family: Calibri;
+    font-size: 20px;
+    font-weight: 200;
+    text-align: center;
+    color: var(--color);
+    border: none;
+}
+section > span > section > input {
+    position: relative;
+    display: block;
+    width: 200px;
+    height: 30px;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    border: solid var(--delete-button-border-color) 1px;
+    background-color: var(--button-link-bg-color);
+    border-radius: 15px;
+    color: var(--delete-button-color);
+    line-height: 30px;
+    font-family: Calibri;
+    font-size: 20px;
+}

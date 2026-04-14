@@ -1,0 +1,224 @@
+table {
+    display: block;
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    width: 650px;
+    height: 580px;
+    transform: translateX(-50%);
+    background-color: var(--box-bg-color);
+    border: solid var(--border-color) 1px;
+    border-radius: 10px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+thead {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 40px;
+}
+
+thead > tr {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 40px;
+    border-bottom: solid var(--border-color) 1px;
+    box-sizing: border-box;
+}
+thead > tr:nth-child(1) > td > span {
+    position: absolute;
+    display: flex;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 326px;
+    box-sizing: border-box;
+}
+thead > tr:nth-child(1) > td > span > button {
+    display: block;
+    flex: 1;
+    padding: 0;
+    height: 43px;
+    margin: auto 0;
+    background-color: var(--button-bg-color);
+    border-radius: 10px;
+    color: var(--unmarked-color);
+    border: solid var(--border-color) 1px;
+    box-sizing: border-box;
+    font-size: 25px;
+    line-height: 43px;
+    font-weight: 700;
+}
+
+thead > tr:nth-child(1) > td > span > p {
+    display: block;
+    flex: 4;
+    margin: auto 20px;
+    padding: 0;
+    height: 43px;
+    background-color: var(--input-bg-color);
+    color: var(--color);
+    border: solid var(--border-color) 1px;
+    border-radius: 10px;
+    font-size: 25px;
+    line-height: 43px;
+    box-sizing: border-box;
+}
+
+tbody {
+    position: relative;
+    display: block;
+    height: 500px;
+    overflow-x: auto;
+    border-bottom: solid var(--border-color) 1px;
+}
+tbody::-webkit-scrollbar {
+    display: none;
+}
+
+tbody > tr {
+    position: relative;
+    display: flex;
+    width: auto;
+    margin: 2px 10px;
+    background-color: var(--marked-box-bg-color);
+    border-radius: 10px;
+    height: 40px;
+    border: solid var(--border-color) 1px;
+    box-sizing: border-box;
+}
+tbody > tr > td:nth-child(2) {
+    border-left: solid var(--border-color) 1px;
+    border-right: solid var(--border-color) 1px;
+}
+tbody > tr > td {
+    font-size: 25px;
+    font-weight: 200px;
+}
+td, th {
+    flex: 1;
+    text-align: center;
+    line-height: 40px;
+    height: 100%;
+    color: var(--color);
+    font-family: Calibri;
+    font-size: 30px;
+    box-sizing: border-box;
+    padding: 0;
+}
+
+form {
+    position: absolute;
+    display: block;
+    top: 100px;
+    right: 20px;
+    width: 250px;
+    height: max-content;
+    background-color: var(--box-bg-color);
+    border: solid var(--border-color) 1px;
+    border-radius: 10px;
+}
+
+form > label {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    border-bottom: solid var(--border-color) 1px;
+    font-family: Calibri;
+    font-size: 25px;
+    text-align: center;
+    color: var(--color);
+    border-radius: 10px 10px 0 0;
+    background-color: var(--marked-box-bg-color);
+    margin-bottom: 20px;
+}
+form > span {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: max-content;
+    border-radius: 0 0 10px 10px;
+}
+
+form > span > section {
+    position: relative;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+    height: 70px;
+    border: none;
+    background: none;
+    border-radius: 0;
+    margin-bottom: 20px;
+}
+form > span > section > label {
+    position: relative;
+    display: block;
+    width: auto;
+    height: 30px;
+    line-height: 30px;
+    margin: 0 20px;
+    background: none;
+    border: none;
+    border-radius: 0;
+    font-family: Calibri;
+    font-size: 25px;
+    text-align: center;
+}
+
+form > span > section > input,
+form > span > section > select
+{
+    position: relative;
+    display: block;
+    width: calc(100% - 10px);
+    height: 40px;
+    background-color: var(--input-bg-color);
+    line-height: 40px;
+    border: solid var(--border-color) 1px;
+    border-radius: 5px;
+    margin: 0 5px;
+    padding: 0;
+    font-size: 20px;
+    text-align: center;
+}
+
+form > span > section:nth-child(3) > span {
+    position: relative;
+    display: flex;
+    left: 5px;
+    width: calc(100% - 10px);
+    height: 40px;
+}
+form > span > section:nth-child(3) > span > input {
+    flex: 1;
+    height: 100%;
+    border: solid var(--border-color) 1px;
+    background-color: var(--input-bg-color);
+    color: var(--color);
+    border-radius: 5px;
+    font-size: 20px;
+    text-align: center;
+}
+
+form > span > input {
+    position: relative;
+    display: block;
+    width: 80%;
+    height: 40px;
+    margin-bottom: 20px;
+    border: solid var(--border-color) 1px;
+    background-color: var(--input-bg-color);
+    color: var(--color);
+    border-radius: 20px;
+    left: 10%;
+}

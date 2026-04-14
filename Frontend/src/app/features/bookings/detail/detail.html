@@ -1,3 +1,39 @@
 <app-component-page>
     <app-component-header />
+    <form action="">
+        <label>prenotation</label>
+        <section>
+            <span>
+                <section>
+                    <label>Classes</label>
+                    <span>
+                        @for (c of prenotation.classes; track c.id) {
+                            {{c.c}}{{(c.id < prenotation.classes.length-1) ? ',' : ''}}
+                        }
+                    </span>
+                </section>
+                <section>
+                    <label>Room</label>
+                    <span>{{prenotation.room}}</span>
+                </section>
+                <section>
+                    <label>Date</label>
+                    <span>{{prenotation.date}}</span>
+                </section>
+                <section>
+                    <label>Hours</label>
+                    <span>{{prenotation.start}} - {{prenotation.end}}</span>
+                </section>
+                <section>
+                    <label>Prof</label>
+                    <span>{{prenotation.teacher}}</span>
+                </section>
+            </span>
+            <span>
+                <section>
+                    <input type="submit" value="delete">
+                </section>
+            </span>
+        </section>
+    </form>
 </app-component-page>
