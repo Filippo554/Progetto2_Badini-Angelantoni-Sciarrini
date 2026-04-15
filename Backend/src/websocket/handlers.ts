@@ -1,8 +1,8 @@
-import { Server, Socket } from "socket.io";
+
 import { AuthSocket, WSUser } from "./types";
 import { WS_EVENTS } from "./events";
 
-export function handleConnection(socket: Socket, io: Server) {
+export function handleConnection(socket: any, io: any) {
   const user = (socket as AuthSocket).user as WSUser | undefined;
 
   if (!user) {
@@ -27,7 +27,7 @@ export function handleConnection(socket: Socket, io: Server) {
     console.log(`[WS] User disconnected: ${user.email}`);
   });
 
-  socket.on("ping", (cb) => {
+  socket.on("ping", (cb: any) => {
     if (typeof cb === "function") cb("pong");
   });
 
@@ -41,22 +41,22 @@ export function handleConnection(socket: Socket, io: Server) {
   });
 }
 
-export function emitPrenotazioneCreata(io: Server, data: unknown) {
+export function emitPrenotazioneCreata(io: any, data: unknown) {
   io.emit(WS_EVENTS.PRENOTAZIONE_CREATED, data);
 }
 
-export function emitPrenotazioneAggiornata(io: Server, data: unknown) {
+export function emitPrenotazioneAggiornata(io: any, data: unknown) {
   io.emit(WS_EVENTS.PRENOTAZIONE_UPDATED, data);
 }
 
-export function emitPrenotazioneEliminata(io: Server, id: number) {
+export function emitPrenotazioneEliminata(io: any, id: number) {
   io.emit(WS_EVENTS.PRENOTAZIONE_DELETED, { id });
 }
 
-export function emitAulaAggiornata(io: Server, data: unknown) {
+export function emitAulaAggiornata(io: any, data: unknown) {
   io.emit(WS_EVENTS.AULA_UPDATED, data);
 }
 
-export function emitClasseAggiornata(io: Server, data: unknown) {
+export function emitClasseAggiornata(io: any, data: unknown) {
   io.emit(WS_EVENTS.CLASSE_UPDATED, data);
 }

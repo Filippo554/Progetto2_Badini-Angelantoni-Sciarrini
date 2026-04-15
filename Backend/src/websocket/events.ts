@@ -14,7 +14,7 @@ export const WS_EVENTS = {
   CLASSE_UPDATED: "classe:updated",
   CLASSE_DELETED: "classe:deleted",
 
-  // Utente (admin actions)
+  // Utente
   UTENTE_UPDATED: "utente:updated",
   UTENTE_DISABLED: "utente:disabled",
   UTENTE_CREATED: "utente:created",

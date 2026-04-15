@@ -1,20 +1,21 @@
 import { sequelize } from "../db/database";
-
 import { Utente } from "./Utente";
 import { Aula } from "./Aula";
 import { Classe } from "./Classe";
 import { Prenotazione } from "./Prenotazione";
 import { PrenotazioneClasse } from "./PrenotazioneClasse";
 
+let initialized = false;
+
 export function initModels(): void {
+  if (initialized) return;
+
   Utente.initModel(sequelize);
   Aula.initModel(sequelize);
   Classe.initModel(sequelize);
   Prenotazione.initModel(sequelize);
   PrenotazioneClasse.initModel(sequelize);
-}
 
-export function initAssociations(): void {
   Utente.hasMany(Prenotazione, {
     foreignKey: "utente_id",
     as: "prenotazioni",
@@ -49,20 +50,9 @@ export function initAssociations(): void {
     as: "prenotazioni",
   });
 
-  PrenotazioneClasse.belongsTo(Prenotazione, {
-    foreignKey: "prenotazione_id",
-  });
-
-  PrenotazioneClasse.belongsTo(Classe, {
-    foreignKey: "classe_id",
-  });
+  initialized = true;
 }
 
-export {
-  sequelize,
-  Utente,
-  Aula,
-  Classe,
-  Prenotazione,
-  PrenotazioneClasse,
-};
+initModels();
+
+export { sequelize, Utente, Aula, Classe, Prenotazione, PrenotazioneClasse };

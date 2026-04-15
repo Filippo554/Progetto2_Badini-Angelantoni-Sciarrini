@@ -1,8 +1,7 @@
-import { Request, Response, NextFunction } from "express";
-import { ZodSchema } from "zod";
+import { Request, Response, NextFunction } from 'express';
 
 export const validate =
-  (schema: ZodSchema) =>
+  (schema: any) =>
   (req: Request, res: Response, next: NextFunction): void => {
     const result = schema.safeParse({
       body: req.body,
@@ -12,10 +11,11 @@ export const validate =
 
     if (!result.success) {
       res.status(400).json({
-        error: "Validazione fallita",
-        details: result.error.errors.map((e) => ({
-          campo: e.path.join("."),
-          messaggio: e.message,
+        error: 'Validazione fallita',
+        code: 'VALIDATION_ERROR',
+        details: result.error.issues.map((issue: any) => ({
+          campo: issue.path.join('.'),
+          messaggio: issue.message,
         })),
       });
       return;
@@ -24,6 +24,5 @@ export const validate =
     req.body = result.data.body ?? req.body;
     req.params = result.data.params ?? req.params;
     req.query = result.data.query ?? req.query;
-
     next();
   };

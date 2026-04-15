@@ -1,5 +1,6 @@
+const { Server: SocketIOServer } = require("socket.io");
 import { Server as HttpServer } from "http";
-import { Server as SocketIOServer } from "socket.io";
+
 import jwt from "jsonwebtoken";
 
 import { WSUser } from "./types";
@@ -11,7 +12,7 @@ type JwtDecoded = {
   ruolo: "studente" | "docente" | "ata" | "admin";
 };
 
-let io: SocketIOServer;
+let io: any;
 
 function getJWTSecret(): string {
   const secret = process.env.JWT_SECRET;
@@ -39,7 +40,7 @@ function verifyToken(token: string): WSUser {
   };
 }
 
-export function initWebSocket(server: HttpServer): SocketIOServer {
+export function initWebSocket(server: HttpServer): any {
   io = new SocketIOServer(server, {
     cors: {
       origin: "*",
@@ -47,7 +48,7 @@ export function initWebSocket(server: HttpServer): SocketIOServer {
     },
   });
 
-  io.use((socket, next) => {
+  io.use((socket: any, next: any) => {
     try {
       const token =
         socket.handshake.auth?.token ||
@@ -67,7 +68,7 @@ export function initWebSocket(server: HttpServer): SocketIOServer {
     }
   });
 
-  io.on("connection", (socket) => {
+  io.on("connection", (socket: any) => {
     const user = (socket as any).user as WSUser | undefined;
 
     if (!user) {
@@ -88,7 +89,7 @@ export function initWebSocket(server: HttpServer): SocketIOServer {
   return io;
 }
 
-export function getIO(): SocketIOServer {
+export function getIO(): any {
   if (!io) throw new Error("WebSocket non inizializzato");
   return io;
 }

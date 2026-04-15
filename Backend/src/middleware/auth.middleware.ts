@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 export type RuoloUtente = "studente" | "docente" | "ata" | "admin";
 
@@ -55,7 +55,7 @@ export function authMiddleware(
   }
 
   try {
-    const decoded = jwt.verify(token, getJWTSecret()) as JwtPayload;
+    const decoded = jwt.verify(token, getJWTSecret()) as any;
 
     if (!isAuthUser(decoded)) {
       res.status(401).json({

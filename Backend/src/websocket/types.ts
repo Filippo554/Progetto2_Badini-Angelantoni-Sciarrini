@@ -1,4 +1,4 @@
-import { Socket } from "socket.io";
+
 
 export type RuoloUtente = "studente" | "docente" | "ata" | "admin";
 
@@ -8,7 +8,7 @@ export interface WSUser {
   ruolo: RuoloUtente;
 }
 
-export interface AuthSocket extends Socket {
+export interface AuthSocket {
   user?: WSUser;
 }
 

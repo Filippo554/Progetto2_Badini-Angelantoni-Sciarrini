@@ -24,20 +24,18 @@ export class Classe extends Model<
           primaryKey: true,
           autoIncrement: true,
         },
-
         nome: {
           type: DataTypes.STRING(10),
           allowNull: false,
           set(value: string) {
-            this.setDataValue("nome", value?.trim());
+            this.setDataValue("nome", value?.trim().toUpperCase());
           },
           validate: {
             notEmpty: true,
-            len: [1, 10],
-            is: /^[1-5][A-Z]$/,
+            len: [2, 10],
+            is: /^[1-5][A-Z]{1,4}$/,
           },
         },
-
         indirizzo: {
           type: DataTypes.STRING(100),
           allowNull: true,
@@ -45,7 +43,6 @@ export class Classe extends Model<
             this.setDataValue("indirizzo", value ? value.trim() : null);
           },
         },
-
         anno: {
           type: DataTypes.SMALLINT,
           allowNull: false,
@@ -60,13 +57,7 @@ export class Classe extends Model<
         sequelize,
         tableName: "classe",
         timestamps: false,
-
-        indexes: [
-          {
-            unique: true,
-            fields: ["nome"],
-          },
-        ],
+        indexes: [{ unique: true, fields: ["nome"] }],
       }
     );
 

@@ -2,110 +2,84 @@ import { Router } from "express";
 import { Classe } from "../models/Classe";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { roleMiddleware } from "../middleware/role.middleware";
-import { isValidId } from "../utils/validate";
+import { validate } from "../middleware/validation.middleware";
+import { classeIdParamSchema, createClasseSchema, updateClasseSchema } from "../schemas/classe.schema";
 
 const router = Router();
 
-// GET all
-router.get("/", authMiddleware, async (_req, res) => {
+router.get("/", authMiddleware, async (_req, res, next) => {
   try {
-    const classi = await Classe.findAll({
-      order: [["anno", "ASC"], ["nome", "ASC"]],
-    });
-
-    res.json(classi);
-  } catch {
-    res.status(500).json({ error: "Errore nel recupero classi" });
+    const classi = await Classe.findAll({ order: [["anno", "ASC"], ["nome", "ASC"]] });
+    res.json({ data: classi });
+  } catch (err) {
+    next(err);
   }
 });
 
-// GET by id
-router.get("/:id", authMiddleware, async (req, res) => {
-  const id = Number(req.params.id);
-
-  if (!isValidId(id)) {
-    return res.status(400).json({ error: "ID non valido" });
-  }
-
+router.get("/:id", authMiddleware, validate(classeIdParamSchema), async (req, res, next) => {
   try {
-    const classe = await Classe.findByPk(id);
-
+    const classe = await Classe.findByPk(Number(req.params.id));
     if (!classe) {
-      return res.status(404).json({ error: "Classe non trovata" });
+      res.status(404).json({ error: "Classe non trovata", code: "NOT_FOUND" });
+      return;
     }
-
-    res.json(classe);
-  } catch {
-    res.status(500).json({ error: "Errore server" });
+    res.json({ data: classe });
+  } catch (err) {
+    next(err);
   }
 });
 
-// CREATE
-router.post(
-  "/",
-  authMiddleware,
-  roleMiddleware(["admin"]),
-  async (req, res) => {
-    try {
-      const { nome, indirizzo, anno } = req.body;
-
-      if (!nome || !anno) {
-        return res.status(400).json({ error: "Dati mancanti" });
-      }
-
-      const annoNum = Number(anno);
-
-      if (!Number.isInteger(annoNum) || annoNum < 1 || annoNum > 5) {
-        return res.status(400).json({ error: "Anno non valido" });
-      }
-
-      const exists = await Classe.findOne({
-        where: { nome: nome.trim(), anno: annoNum },
-      });
-
-      if (exists) {
-        return res.status(409).json({ error: "Classe già esistente" });
-      }
-
-      const nuova = await Classe.create({
-        nome: nome.trim(),
-        indirizzo: indirizzo?.trim() ?? null,
-        anno: annoNum,
-      });
-
-      res.status(201).json(nuova);
-    } catch {
-      res.status(500).json({ error: "Errore creazione classe" });
+router.post("/", authMiddleware, roleMiddleware(["admin"]), validate(createClasseSchema), async (req, res, next) => {
+  try {
+    const payload = { ...req.body, nome: req.body.nome.trim().toUpperCase() };
+    const exists = await Classe.findOne({ where: { nome: payload.nome } });
+    if (exists) {
+      res.status(409).json({ error: "Classe già esistente", code: "ALREADY_EXISTS" });
+      return;
     }
+    const nuova = await Classe.create(payload);
+    res.status(201).json({ data: nuova });
+  } catch (err) {
+    next(err);
   }
-);
+});
 
-// DELETE
-router.delete(
-  "/:id",
-  authMiddleware,
-  roleMiddleware(["admin"]),
-  async (req, res) => {
+router.put("/:id", authMiddleware, roleMiddleware(["admin"]), validate(classeIdParamSchema), validate(updateClasseSchema), async (req, res, next) => {
+  try {
     const id = Number(req.params.id);
-
-    if (!isValidId(id)) {
-      return res.status(400).json({ error: "ID non valido" });
+    const classe = await Classe.findByPk(id);
+    if (!classe) {
+      res.status(404).json({ error: "Classe non trovata", code: "NOT_FOUND" });
+      return;
     }
-
-    try {
-      const classe = await Classe.findByPk(id);
-
-      if (!classe) {
-        return res.status(404).json({ error: "Classe non trovata" });
+    const payload = { ...req.body };
+    if (payload.nome) payload.nome = payload.nome.trim().toUpperCase();
+    if (payload.nome && payload.nome !== classe.nome) {
+      const dup = await Classe.findOne({ where: { nome: payload.nome } });
+      if (dup) {
+        res.status(409).json({ error: "Classe già esistente", code: "ALREADY_EXISTS" });
+        return;
       }
-
-      await classe.destroy();
-
-      res.json({ message: "Eliminata" });
-    } catch {
-      res.status(500).json({ error: "Errore eliminazione" });
     }
+    await classe.update(payload);
+    res.json({ data: classe });
+  } catch (err) {
+    next(err);
   }
-);
+});
+
+router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), validate(classeIdParamSchema), async (req, res, next) => {
+  try {
+    const classe = await Classe.findByPk(Number(req.params.id));
+    if (!classe) {
+      res.status(404).json({ error: "Classe non trovata", code: "NOT_FOUND" });
+      return;
+    }
+    await classe.destroy();
+    res.json({ message: "Classe eliminata con successo" });
+  } catch (err) {
+    next(err);
+  }
+});
 
 export default router;
