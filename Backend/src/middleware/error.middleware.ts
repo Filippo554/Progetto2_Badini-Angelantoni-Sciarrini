@@ -19,13 +19,13 @@ export function errorMiddleware(
   res: Response,
   _next: NextFunction
 ): void {
-  console.error("[ERROR]", err);
+  console.error("ERROR:", err);
 
   const error = err as AppError;
 
-  if (error?.statusCode) {
+  if (error.statusCode) {
     res.status(error.statusCode).json({
-      error: error.message || "Errore",
+      error: error.message,
       code: error.code || "APP_ERROR",
     });
     return;
@@ -33,11 +33,11 @@ export function errorMiddleware(
 
   if (err instanceof ValidationError) {
     res.status(400).json({
-      error: "Dati non validi",
+      error: "Errore di validazione",
       code: "VALIDATION_ERROR",
       details: err.errors.map((e) => ({
-        campo: e.path,
-        messaggio: e.message,
+        field: e.path,
+        message: e.message,
       })),
     });
     return;
@@ -46,12 +46,11 @@ export function errorMiddleware(
   if (err instanceof UniqueConstraintError) {
     res.status(409).json({
       error: "Risorsa già esistente",
-      code: "UNIQUE_CONSTRAINT",
+      code: "DUPLICATE_ENTRY",
     });
     return;
   }
 
-  // fallback
   res.status(500).json({
     error: "Errore interno del server",
     code: "INTERNAL_ERROR",

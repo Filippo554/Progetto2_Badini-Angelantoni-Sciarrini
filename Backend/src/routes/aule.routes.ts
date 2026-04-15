@@ -16,9 +16,12 @@ router.get("/", authMiddleware, async (_req, res) => {
       order: [["numero", "ASC"]],
     });
 
-    res.json({ data: aule });
+    res.json({ success: true, data: aule });
   } catch {
-    res.status(500).json({ error: "Errore nel recupero delle aule" });
+    res.status(500).json({
+      success: false,
+      error: "Errore nel recupero delle aule",
+    });
   }
 });
 
@@ -28,20 +31,27 @@ router.get("/:id", authMiddleware, async (req, res) => {
     const id = Number(req.params.id);
 
     if (!isValidId(id)) {
-      res.status(400).json({ error: "ID aula non valido" });
-      return;
+      return res.status(400).json({
+        success: false,
+        error: "ID aula non valido",
+      });
     }
 
     const aula = await Aula.findByPk(id);
 
     if (!aula) {
-      res.status(404).json({ error: "Aula non trovata" });
-      return;
+      return res.status(404).json({
+        success: false,
+        error: "Aula non trovata",
+      });
     }
 
-    res.json({ data: aula });
+    res.json({ success: true, data: aula });
   } catch {
-    res.status(500).json({ error: "Errore server" });
+    res.status(500).json({
+      success: false,
+      error: "Errore server",
+    });
   }
 });
 
@@ -56,16 +66,11 @@ router.post(
 
       const numeroAula = Number(numero);
 
-      if (!Number.isInteger(numeroAula)) {
-        res.status(400).json({ error: "Numero aula non valido" });
-        return;
-      }
-
-      if (numeroAula < 1 || numeroAula > 119) {
-        res.status(400).json({
-          error: "Numero aula deve essere tra 1 e 119",
+      if (!Number.isInteger(numeroAula) || numeroAula < 1 || numeroAula > 119) {
+        return res.status(400).json({
+          success: false,
+          error: "Numero aula non valido (1-119)",
         });
-        return;
       }
 
       const esistente = await Aula.findOne({
@@ -73,20 +78,28 @@ router.post(
       });
 
       if (esistente) {
-        res.status(409).json({ error: "Aula già esistente" });
-        return;
+        return res.status(409).json({
+          success: false,
+          error: "Aula già esistente",
+        });
       }
 
       const nuovaAula = await Aula.create({
         numero: numeroAula,
-        capienza: capienza ?? 30,
+        capienza: Number(capienza) || 30,
         descrizione: descrizione ?? null,
         piano: piano ?? null,
       });
 
-      res.status(201).json({ data: nuovaAula });
+      res.status(201).json({
+        success: true,
+        data: nuovaAula,
+      });
     } catch {
-      res.status(500).json({ error: "Errore creazione aula" });
+      res.status(500).json({
+        success: false,
+        error: "Errore creazione aula",
+      });
     }
   }
 );
@@ -101,22 +114,32 @@ router.delete(
       const id = Number(req.params.id);
 
       if (!isValidId(id)) {
-        res.status(400).json({ error: "ID aula non valido" });
-        return;
+        return res.status(400).json({
+          success: false,
+          error: "ID aula non valido",
+        });
       }
 
       const aula = await Aula.findByPk(id);
 
       if (!aula) {
-        res.status(404).json({ error: "Aula non trovata" });
-        return;
+        return res.status(404).json({
+          success: false,
+          error: "Aula non trovata",
+        });
       }
 
       await aula.destroy();
 
-      res.json({ message: "Aula eliminata con successo" });
+      res.json({
+        success: true,
+        message: "Aula eliminata con successo",
+      });
     } catch {
-      res.status(500).json({ error: "Errore eliminazione aula" });
+      res.status(500).json({
+        success: false,
+        error: "Errore eliminazione aula",
+      });
     }
   }
 );

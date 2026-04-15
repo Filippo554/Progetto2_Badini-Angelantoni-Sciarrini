@@ -36,7 +36,7 @@ export class Utente extends Model<
           allowNull: false,
           unique: true,
           set(value: string) {
-            this.setDataValue("email", value.toLowerCase().trim());
+            this.setDataValue("email", value.trim().toLowerCase());
           },
           validate: {
             isEmail: true,

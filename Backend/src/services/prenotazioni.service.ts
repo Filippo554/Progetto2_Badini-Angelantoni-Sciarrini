@@ -1,45 +1,102 @@
-import { PrenotazioniRepository } from '../repositories/prenotazioni.repository';
-import { CreatePrenotazioneDto } from '../models/interfaces';
-import { broadcast } from '../websocket';
+import { Prenotazione } from "../models/Prenotazione";
+import { Aula } from "../models/Aula";
+import { Classe } from "../models/Classe";
+import { Utente } from "../models/Utente";
 
-const repo = new PrenotazioniRepository();
+export interface CreatePrenotazioneDTO {
+  utente_id?: number | null;
+  aula_id: number;
+  data: string;
+  ora_inizio: string;
+  ora_fine: string;
+  note?: string | null;
+  classi_ids?: number[];
+}
+
+function cleanString(v?: string | null): string | undefined {
+  if (typeof v !== "string") return undefined;
+  const t = v.trim();
+  return t.length ? t : undefined;
+}
+
+function isValidTimeRange(start: string, end: string): boolean {
+  return start < end;
+}
 
 export class PrenotazioniService {
+  static async create(data: CreatePrenotazioneDTO) {
+    if (!isValidTimeRange(data.ora_inizio, data.ora_fine)) {
+      throw new Error("Ora fine deve essere maggiore di ora inizio");
+    }
 
-  async getAll(filters: {
-    aula_id?: number; classe_id?: number;
-    data?: string; settimana?: number; anno?: number;
-  }) {
-    return repo.findAll(filters);
+    const aula = await Aula.findByPk(data.aula_id);
+    if (!aula) throw new Error("Aula non trovata");
+
+    const overlap = await Prenotazione.findOne({
+      where: {
+        aula_id: data.aula_id,
+        data: data.data,
+      },
+    });
+
+    if (overlap) {
+      const startA = overlap.ora_inizio;
+      const endA = overlap.ora_fine;
+
+      if (
+        (data.ora_inizio >= startA && data.ora_inizio < endA) ||
+        (data.ora_fine > startA && data.ora_fine <= endA)
+      ) {
+        throw new Error("Conflitto orario con prenotazione esistente");
+      }
+    }
+
+    const prenotazione = await Prenotazione.create({
+      utente_id: data.utente_id ?? null,
+      aula_id: data.aula_id,
+      data: data.data,
+      ora_inizio: data.ora_inizio,
+      ora_fine: data.ora_fine,
+      note: cleanString(data.note) ?? null,
+    });
+
+    if (data.classi_ids?.length) {
+      const classi = await Classe.findAll({
+        where: { id: data.classi_ids },
+      });
+
+      await prenotazione.setClassi(classi);
+    }
+
+    return prenotazione;
   }
 
-  async getById(id: number) {
-    const p = await repo.findById(id);
-    if (!p) throw { status: 404, message: 'Prenotazione non trovata' };
-    return p;
+  static async getAll() {
+    return Prenotazione.findAll({
+      include: [
+        { model: Aula, as: "aula" },
+        { model: Utente, as: "utente" },
+        { model: Classe, as: "classi" },
+      ],
+      order: [["data", "DESC"]],
+    });
   }
 
-  async create(dto: CreatePrenotazioneDto, utente_id: number) {
-    if (!dto.aula_id || !dto.data || !dto.ora_inizio || !dto.ora_fine)
-      throw { status: 400, message: 'Campi obbligatori mancanti: aula_id, data, ora_inizio, ora_fine' };
-    if (dto.ora_fine <= dto.ora_inizio)
-      throw { status: 400, message: 'ora_fine deve essere successiva a ora_inizio' };
-
-    const conflitti = await repo.checkOverlap(dto.aula_id, dto.data, dto.ora_inizio, dto.ora_fine);
-    if (conflitti.length > 0)
-      throw { status: 409, message: 'L\'aula è già prenotata nell\'intervallo orario selezionato', code: 'OVERLAP_CONFLICT', conflitti };
-
-    const id = await repo.create(dto, utente_id);
-    broadcast('PRENOTAZIONE_CREATA', { id, ...dto });
-    return id;
+  static async getById(id: number) {
+    return Prenotazione.findByPk(id, {
+      include: [
+        { model: Aula, as: "aula" },
+        { model: Utente, as: "utente" },
+        { model: Classe, as: "classi" },
+      ],
+    });
   }
 
-  async delete(id: number, utente_id: number, ruolo: string) {
-    const p = await repo.findOwner(id);
-    if (!p) throw { status: 404, message: 'Prenotazione non trovata' };
-    if (ruolo !== 'admin' && p.utente_id !== utente_id)
-      throw { status: 403, message: 'Non puoi eliminare una prenotazione di un altro utente' };
-    await repo.delete(id);
-    broadcast('PRENOTAZIONE_ELIMINATA', { id });
+  static async delete(id: number) {
+    const p = await Prenotazione.findByPk(id);
+    if (!p) return false;
+
+    await p.destroy();
+    return true;
   }
 }

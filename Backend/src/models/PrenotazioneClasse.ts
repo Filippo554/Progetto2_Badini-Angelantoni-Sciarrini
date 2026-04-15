@@ -3,7 +3,6 @@ import {
   DataTypes,
   InferAttributes,
   InferCreationAttributes,
-  ForeignKey,
   Sequelize,
 } from "sequelize";
 
@@ -11,8 +10,8 @@ export class PrenotazioneClasse extends Model<
   InferAttributes<PrenotazioneClasse>,
   InferCreationAttributes<PrenotazioneClasse>
 > {
-  declare prenotazione_id: ForeignKey<number>;
-  declare classe_id: ForeignKey<number>;
+  declare prenotazione_id: number;
+  declare classe_id: number;
 
   static initModel(sequelize: Sequelize): typeof PrenotazioneClasse {
     PrenotazioneClasse.init(

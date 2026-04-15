@@ -32,7 +32,9 @@ export class Classe extends Model<
             this.setDataValue("nome", value?.trim());
           },
           validate: {
+            notEmpty: true,
             len: [1, 10],
+            is: /^[1-5][A-Z]$/,
           },
         },
 
@@ -58,6 +60,13 @@ export class Classe extends Model<
         sequelize,
         tableName: "classe",
         timestamps: false,
+
+        indexes: [
+          {
+            unique: true,
+            fields: ["nome"],
+          },
+        ],
       }
     );
 

@@ -6,48 +6,57 @@ import { Classe } from "./Classe";
 import { Prenotazione } from "./Prenotazione";
 import { PrenotazioneClasse } from "./PrenotazioneClasse";
 
-Utente.initModel(sequelize);
-Aula.initModel(sequelize);
-Classe.initModel(sequelize);
-Prenotazione.initModel(sequelize);
-PrenotazioneClasse.initModel(sequelize);
+export function initModels(): void {
+  Utente.initModel(sequelize);
+  Aula.initModel(sequelize);
+  Classe.initModel(sequelize);
+  Prenotazione.initModel(sequelize);
+  PrenotazioneClasse.initModel(sequelize);
+}
 
-// relazione prenotazione -> utente (1:N)
-Prenotazione.belongsTo(Utente, {
-  foreignKey: "utente_id",
-  as: "utente",
-});
+export function initAssociations(): void {
+  Utente.hasMany(Prenotazione, {
+    foreignKey: "utente_id",
+    as: "prenotazioni",
+  });
 
-Utente.hasMany(Prenotazione, {
-  foreignKey: "utente_id",
-  as: "prenotazioni",
-});
+  Prenotazione.belongsTo(Utente, {
+    foreignKey: "utente_id",
+    as: "utente",
+  });
 
-// relazione prenotazione -> aula (1:N)
-Prenotazione.belongsTo(Aula, {
-  foreignKey: "aula_id",
-  as: "aula",
-});
+  Aula.hasMany(Prenotazione, {
+    foreignKey: "aula_id",
+    as: "prenotazioni",
+  });
 
-Aula.hasMany(Prenotazione, {
-  foreignKey: "aula_id",
-  as: "prenotazioni",
-});
+  Prenotazione.belongsTo(Aula, {
+    foreignKey: "aula_id",
+    as: "aula",
+  });
 
-// relazione prenotazione <-> classe (N:N)
-Prenotazione.belongsToMany(Classe, {
-  through: PrenotazioneClasse,
-  foreignKey: "prenotazione_id",
-  otherKey: "classe_id",
-  as: "classi",
-});
+  Prenotazione.belongsToMany(Classe, {
+    through: PrenotazioneClasse,
+    foreignKey: "prenotazione_id",
+    otherKey: "classe_id",
+    as: "classi",
+  });
 
-Classe.belongsToMany(Prenotazione, {
-  through: PrenotazioneClasse,
-  foreignKey: "classe_id",
-  otherKey: "prenotazione_id",
-  as: "prenotazioni",
-});
+  Classe.belongsToMany(Prenotazione, {
+    through: PrenotazioneClasse,
+    foreignKey: "classe_id",
+    otherKey: "prenotazione_id",
+    as: "prenotazioni",
+  });
+
+  PrenotazioneClasse.belongsTo(Prenotazione, {
+    foreignKey: "prenotazione_id",
+  });
+
+  PrenotazioneClasse.belongsTo(Classe, {
+    foreignKey: "classe_id",
+  });
+}
 
 export {
   sequelize,
