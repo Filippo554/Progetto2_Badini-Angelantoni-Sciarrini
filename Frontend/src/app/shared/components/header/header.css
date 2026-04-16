@@ -1,74 +1,63 @@
+* {
+    color: var(--color);
+    font-family: Calibri;
+}
 header
 {
-    position: absolute;
+    position: relative;
     display: block;
-    top: 0;
-    left: 0;
+    margin: 0;
+    padding: 0;
     width: 100%;
-    height: 50px;
+    height: 60px;
     background-color: var(--box-bg-color);
     border-bottom: solid var(--border-color) 1px;
 }
 
-header > span
-{
-    position: absolute;
-    width: 420px;
-    height: 44px;
-    top: 3px;
-    right: 10px;
-    margin: 0;
-}
-header > span > p
-{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 330px;
-    height: 44px;
-    line-height: 44px;
-    font-family: Calibri;
-    text-align: right;
-    font-weight: bold;
-    font-size: 35px;
-    margin: 0;
-    color: var(--color);
-}
-header > span > img
-{
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 38px;
-    height: 38px;
-    border-radius: 38px;
-    border: solid var(--border-color) 3px;
-}
-
 ul {
-    display: block;
     position: absolute;
-    top: 50px;
-    right: 0;
-    width: 420px;
-    height: max-content;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-li {
     display: block;
-    position: relative;
-    width: 100%;
-    height: 30px;
-    line-height: 30px;
-    font-size: 20px;
-    color: var(--color);
-    font-family: Calibri;
-    background-color: var(--box-bg-color);
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: max-content;
+    z-index: 1000;
+    list-style: none;
     margin: 0;
     padding: 0;
+}
+ul > li {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 60px;
+}
+ul > li > span {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+ul > li > span > p {
+    position: relative;
+    display: block;
+    flex: 1;
+    height: 100%;
+    margin: 0;
+    line-height: 60px;
+    font-size: 30px;
+}
+ul > li {
+    line-height: 60px;
+    font-size: 30px;
+}
+ul > li > span > img {
+    position: relative;
+    display: block;
+    width: 50px;
+    height: 50px;
     border: solid var(--border-color) 1px;
-    box-sizing: border-box;
-    text-align: center;
+    top: 5px;
+    right: 5px;
+    border-radius: 25px;
 }

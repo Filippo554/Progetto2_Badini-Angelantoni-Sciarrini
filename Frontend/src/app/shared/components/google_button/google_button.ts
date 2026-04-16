@@ -22,7 +22,7 @@ export class GoogleButtonComponent implements AfterViewInit {
             client_id: this.sessionService.get_client_id(),
             callback: (response: any) => {
                 const credential = response.credential;
-
+                console.log(credential);
                 fetch('http://localhost:3000/api/v1/auth/google', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -31,7 +31,7 @@ export class GoogleButtonComponent implements AfterViewInit {
                 .then(res => res.json())
                 .then(data => {
                     console.log('Token JWT:', data.token);
-                    console.log('Utente:', data.utente);
+                    console.log('Utente:', data.user);
                 })
                 .catch(err => console.error('Errore login:', err));
             }

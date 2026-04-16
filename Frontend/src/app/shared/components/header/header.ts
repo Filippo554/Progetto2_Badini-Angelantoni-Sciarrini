@@ -18,4 +18,10 @@ export class HeaderComponent {
         this.theme = (this.themeService.isDark()) ? 'dark' : 'light';
     }
     
+
+    name = 'Roberto';
+    surname = 'Carlos';
+    togglelist() {
+        
+    }
 }

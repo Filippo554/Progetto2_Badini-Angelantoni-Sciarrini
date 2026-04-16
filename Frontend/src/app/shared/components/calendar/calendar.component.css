@@ -1,0 +1,188 @@
+* {
+    box-sizing: border-box;
+    color: var(--color);
+}
+table {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto 50px auto;
+    background-color: var(--box-bg-color);
+    border: solid var(--border-color) 1px;
+    border-radius: 10px;
+}
+table > thead {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: max-content;
+    background-color: var(--marked-box-bg-color);
+    border-radius: 10px 10px 0 0;
+    border-bottom: solid var(--border-color) 1px;
+}
+table > thead > tr {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 40px;
+    border-bottom: solid var(--border-color) 1px;
+}
+table > thead > tr > th,
+table > thead > tr > td {
+    position: relative;
+    display: block;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    line-height: 40px;
+    font-family: Calibri;
+    font-size: 26px;
+}
+table > thead > tr > td > span {
+    position: relative;
+    display: flex;
+    height: 100%;
+    width: 250px;
+    margin: 0 auto;
+}
+table > thead > tr > td > span > button {
+    position: relative;
+    display: block;
+    flex: 1;
+    height: 33px;
+    margin: auto 0;
+    padding: 0;
+    line-height: 33px;
+    background-color: var(--button-bg-color);
+    border: solid var(--border-color) 1px;
+    border-radius: 10px;
+}
+table > thead > tr > td > span > p {
+    position: relative;
+    display: block;
+    flex: 3;
+    height: 33px;
+    margin: auto 10px;
+    line-height: 33px;
+    background-color: var(--input-bg-color);
+    border: solid var(--border-color) 1px;
+    border-radius: 10px;
+}
+table > thead > tr:last-child > th {
+    font-size: 20px;
+    font-weight: 400px;
+    border-right: solid var(--border-color) 1px;
+}
+table > thead > tr:last-child > th:last-child {
+    border-right: none;
+}
+table > tbody {
+    position: relative;
+    display: block;
+    width: 100%;
+    flex: 1;
+    overflow: hidden;
+}
+
+table > tbody > tr {
+    position: relative;
+    display: flex;
+    width: 100%;
+    border-bottom: solid var(--border-color) 1px;
+}
+table > tbody > tr > td {
+    position: relative;
+    display: block;
+    flex: 1;
+    height: 100%;
+    border-right: solid var(--border-color) 1px;
+    padding: 0;
+}
+table > tbody > tr > td:last-child {
+    border-right: none;
+}
+
+table > tbody > tr > td > table {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+}
+
+table > tbody > tr > td > table > thead {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 40px;
+    border-bottom: solid var(--border-color) 1px;
+    /* background: none; */
+    border-radius: 0;
+}
+table > tbody > tr > td > table > thead > tr > th {
+    color: var(--color);
+}
+table > tbody > tr > td > table > thead > tr > th.obscured {
+    color: var(--unmarked-color);
+}
+table > tbody > tr > td > table > tbody {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: calc(100% - 40px);
+    overflow-x: auto;
+}
+table > tbody > tr > td > table > tbody::-webkit-scrollbar {
+    display: none;
+}
+table > tbody > tr > td > table > tbody > tr {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 40px;
+    border: none;
+}
+table > tbody > tr > td > table > tbody > tr > td {
+    flex: 1;
+    background: none;
+}
+table > tbody > tr > td > table > tbody > tr > td > div {
+    position: relative;
+    display: block;
+    margin: 1px 1px 2px 1px;
+    width: auto;
+    height: 37px;
+    line-height: 37px;
+    background-color: var(--marked-box-bg-color);
+    border: solid var(--border-color) 1px;
+    border-radius: 5px;
+    text-align: center;
+    font-family: Calibri;
+}
+table > tbody > tr > td > table > tbody > tr:first-child {
+    position: absolute;
+    display: flex;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+table > tbody > tr > td > table > tbody > tr:first-child > td:first-child {
+    position: relative;
+    display: flex;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+tfoot {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 40px;
+    border-top: solid var(--border-color) 1px;
+}

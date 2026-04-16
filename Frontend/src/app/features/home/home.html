@@ -1,3 +1,28 @@
 <app-component-page>
-    <app-component-header />
+    <section>
+        <span>
+            <app-component-daily width="650" height="250" type="partial">
+                <app-component-link height="33" placeholder="view all" link="/daily" />
+            </app-component-daily>
+        </span>
+        <span>
+            <app-component-weekly width="650" height="250" type="partial">
+                <app-component-link height="33" placeholder="view all" link="/weekly" />
+            </app-component-weekly>
+        </span>
+    </section>
+    <section>
+        <app-component-calendar width="1050" height="400" type="partial" innerheight="140">
+            <app-component-link height="33" placeholder="view all" link="/calendar" />
+        </app-component-calendar>
+    </section>
+    
+    <section>
+        <span>
+            <app-component-link width="300" height="35" placeholder="book" link="/book" />
+        </span>
+        <span>
+            <app-component-link width="300" height="35" placeholder="search" link="/search" />
+        </span>
+    </section>
 </app-component-page>

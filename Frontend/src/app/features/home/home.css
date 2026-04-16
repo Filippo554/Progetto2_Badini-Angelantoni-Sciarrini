@@ -1,0 +1,11 @@
+section {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    width: max-content;
+    height: max-content;
+    margin: 50px auto;
+}
+span {
+    margin: 0 30px;
+}

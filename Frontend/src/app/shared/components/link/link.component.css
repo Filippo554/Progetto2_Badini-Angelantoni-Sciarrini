@@ -1,0 +1,12 @@
+button {
+    position: relative;
+    display: block;
+    border: solid var(--border-color) 1px;
+    background-color: var(--input-bg-color);
+    color: var(--color);
+    border-radius: 9999px;
+    margin: 3px auto;
+    font-family: Calibri;
+    font-size: 130%;
+    font-weight: 600;
+}

@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { Login } from './features/login/login'
-import { Create } from './features/bookings/create/create';
+import { Book } from './features/bookings/book/book';
 import { Detail } from './features/bookings/detail/detail';
 import { Search } from './features/bookings/search/search';
 import { Calendar } from './features/bookings/views/calendar/calendar';
@@ -18,7 +18,7 @@ export const routes: Routes = [
     { path: 'login',    component: Login                      },
     { path: 'search',   component: Search                     },
     { path: 'detail',   component: Detail                     },
-    { path: 'create',   component: Create                     },
+    { path: 'book',     component: Book                     },
     { path: 'error',    component: Error                      },
     {
         path: '**',

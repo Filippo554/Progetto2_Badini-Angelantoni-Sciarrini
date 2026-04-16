@@ -1,0 +1,119 @@
+<table [style.width.px]="width" [style.height.px]="height">
+    <thead>
+        @if (type == "full") {
+            <tr class="l1">
+                <td colspan="7">
+                    <span>
+                        <button (click)="previous()">&lt;</button>
+                        <p>{{ weeks[week].days }}</p>
+                        <button (click)="next()">&gt;</button>
+                    </span>
+                </td>
+            </tr>
+        }
+        <tr class="l2">
+            <th>Monday</th>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+            <th>Friday</th>
+            <th>Saturday</th>
+            <th>Sunday</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (r of rows; track r.id) {
+            <tr>
+                <td>
+                    @if (r.mon !== '') {
+                        <div>
+                            <span>{{ asSlot(r.mon).hours }}</span>
+                            <span>
+                                <p>{{ asSlot(r.mon).class }}</p>
+                                <p>{{ asSlot(r.mon).room }}</p>
+                            </span>
+                        </div>
+                    }
+                </td>
+                <td>
+                    @if (r.tue !== '') {
+                        <div>
+                            <span>{{ asSlot(r.tue).hours }}</span>
+                            <span>
+                                <p>{{ asSlot(r.tue).class }}</p>
+                                <p>{{ asSlot(r.tue).room }}</p>
+                            </span>
+                        </div>
+                    }
+                </td>
+                <td>
+                    @if (r.wed !== '') {
+                        <div>
+                            <span>{{ asSlot(r.wed).hours }}</span>
+                            <span>
+                                <p>{{ asSlot(r.wed).class }}</p>
+                                <p>{{ asSlot(r.wed).room }}</p>
+                            </span>
+                        </div>
+                    }
+                </td>
+                <td>
+                    @if (r.thu !== '') {
+                        <div>
+                            <span>{{ asSlot(r.thu).hours }}</span>
+                            <span>
+                                <p>{{ asSlot(r.thu).class }}</p>
+                                <p>{{ asSlot(r.thu).room }}</p>
+                            </span>
+                        </div>
+                    }
+                </td>
+                <td>
+                    @if (r.fri !== '') {
+                        <div>
+                            <span>{{ asSlot(r.fri).hours }}</span>
+                            <span>
+                                <p>{{ asSlot(r.fri).class }}</p>
+                                <p>{{ asSlot(r.fri).room }}</p>
+                            </span>
+                        </div>
+                    }
+                </td>
+                <td>
+                    @if (r.sat !== '') {
+                        <div>
+                            <span>{{ asSlot(r.sat).hours }}</span>
+                            <span>
+                                <p>{{ asSlot(r.sat).class }}</p>
+                                <p>{{ asSlot(r.sat).room }}</p>
+                            </span>
+                        </div>
+                    }
+                </td>
+                <td>
+                    @if (r.sun !== '') {
+                        <div>
+                            <span>{{ asSlot(r.sun).hours }}</span>
+                            <span>
+                                <p>{{ asSlot(r.sun).class }}</p>
+                                <p>{{ asSlot(r.sun).room }}</p>
+                            </span>
+                        </div>
+                    }
+                </td>
+            </tr>
+        }
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <ng-content />
+    </tfoot>
+</table>

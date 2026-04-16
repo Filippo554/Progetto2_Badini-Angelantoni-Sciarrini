@@ -1,7 +1,12 @@
 <header>
     <app-logo />
-    <span><p>Roberto Carlos</p><img ngSrc="images/temp.png" width="70" height="70" /></span>
     <ul>
+        <li (click)="togglelist()">
+            <span>
+                <p>{{name}} {{surname}}</p>
+                <img ngSrc="images/temp.png" width="70" height="70" />
+            </span>
+        </li>
         <li (click)="toggle()">{{theme}}</li>
     </ul>
 </header>

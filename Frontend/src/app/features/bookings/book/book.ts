@@ -2,15 +2,14 @@ import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormControl, FormGroup, FormsModule, Validators  } from '@angular/forms';
 
 import { Page } from '../../../shared/components/page/page';
-import { HeaderComponent } from '../../../shared/components/header/header';
 
 @Component({
-    selector: 'app-create',
-    templateUrl: './create.html',
-    styleUrl: './create.css',
-    imports: [ReactiveFormsModule, FormsModule, Page, HeaderComponent],
+    selector: 'app-book',
+    templateUrl: './book.html',
+    styleUrl: './book.css',
+    imports: [ReactiveFormsModule, FormsModule, Page],
 })
-export class Create {
+export class Book {
     classes = [
         {c: '1ACA'},
         {c: '1ACM'},
