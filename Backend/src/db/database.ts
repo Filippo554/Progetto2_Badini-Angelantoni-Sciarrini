@@ -5,7 +5,7 @@ dotenv.config();
 
 function getEnv(key: string): string {
   const value = process.env[key];
-  if (!value) throw new Error(`Variabile mancante: ${key}`);
+  if (value === undefined) throw new Error(`Variabile mancante: ${key}`);
   return value;
 }
 

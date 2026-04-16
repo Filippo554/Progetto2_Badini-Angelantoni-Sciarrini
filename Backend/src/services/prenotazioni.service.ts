@@ -17,8 +17,8 @@ const INCLUDE_FULL = [
 export interface PrenotazioniQueryDTO {
   data?: string;
   settimana?: string;
-  aula_id?: number;
-  classe_id?: number;
+  aulaId?: number;
+  classeId?: number;
 }
 
 export interface CreatePrenotazioneDTO {
@@ -48,20 +48,33 @@ export class PrenotazioniService {
       where['data'] = query.data;
     } else if (query.settimana) {
       const range = getWeekRange(query.settimana);
-      if (!range) throw badRequest('Data settimana non valida', 'INVALID_DATE');
+      if (!range) {
+        throw badRequest('Data settimana non valida', 'INVALID_DATE');
+      }
       where['data'] = { [Op.between]: [range.lunedi, range.domenica] };
     }
 
-    if (query.aula_id) where['aula_id'] = query.aula_id;
+    if (query.aulaId) {
+      where['aula_id'] = query.aulaId;
+    }
 
     return Prenotazione.findAll({
       where,
       include: [
         { model: Aula, as: 'aula' },
         { model: Utente, as: 'utente', attributes: ['id', 'nome', 'cognome', 'email'] },
-        query.classe_id
-          ? { model: Classe, as: 'classi', where: { id: query.classe_id }, through: { attributes: [] } }
-          : { model: Classe, as: 'classi', through: { attributes: [] } },
+        query.classeId
+          ? {
+              model: Classe,
+              as: 'classi',
+              where: { id: query.classeId },
+              through: { attributes: [] },
+            }
+          : {
+              model: Classe,
+              as: 'classi',
+              through: { attributes: [] },
+            },
       ],
       order: [['data', 'ASC'], ['ora_inizio', 'ASC']],
     });
@@ -105,7 +118,10 @@ export class PrenotazioniService {
       );
 
       if (payload.classi?.length) {
-        const classi = await Classe.findAll({ where: { id: payload.classi }, transaction });
+        const classi = await Classe.findAll({
+          where: { id: payload.classi },
+          transaction,
+        });
         await prenotazione.setClassi(classi, { transaction });
       }
 
@@ -116,6 +132,7 @@ export class PrenotazioniService {
   static async update(id: number, user: AuthUser, payload: UpdatePrenotazioneDTO) {
     const prenotazione = await Prenotazione.findByPk(id);
     if (!prenotazione) throw notFound('Prenotazione non trovata');
+
     await this.assertCanModify(user, prenotazione);
 
     const nextAulaId = payload.aula_id ?? prenotazione.aula_id;
@@ -143,15 +160,22 @@ export class PrenotazioniService {
           data: nextData,
           ora_inizio: nextOraInizio,
           ora_fine: nextOraFine,
-          note: payload.note !== undefined ? normalizeOptionalText(payload.note) : prenotazione.note,
+          note:
+            payload.note !== undefined
+              ? normalizeOptionalText(payload.note)
+              : prenotazione.note,
         },
         { transaction },
       );
 
       if (payload.classi) {
         const classi = payload.classi.length
-          ? await Classe.findAll({ where: { id: payload.classi }, transaction })
+          ? await Classe.findAll({
+              where: { id: payload.classi },
+              transaction,
+            })
           : [];
+
         await prenotazione.setClassi(classi, { transaction });
       }
 
@@ -162,14 +186,19 @@ export class PrenotazioniService {
   static async delete(id: number, user: AuthUser) {
     const prenotazione = await Prenotazione.findByPk(id);
     if (!prenotazione) throw notFound('Prenotazione non trovata');
+
     await this.assertCanModify(user, prenotazione);
     await prenotazione.destroy();
+
     return { message: 'Prenotazione eliminata con successo' };
   }
 
   private static ensureTimeRange(ora_inizio: string, ora_fine: string): void {
     if (!isValidTimeRange(ora_inizio, ora_fine)) {
-      throw badRequest("L'orario di inizio deve essere precedente all'orario di fine", 'INVALID_TIME_RANGE');
+      throw badRequest(
+        "L'orario di inizio deve essere precedente all'orario di fine",
+        'INVALID_TIME_RANGE',
+      );
     }
   }
 
@@ -180,8 +209,10 @@ export class PrenotazioniService {
 
   private static async ensureClassiExist(classi?: number[]): Promise<void> {
     if (classi === undefined) return;
+
     const uniqueIds = [...new Set(classi)];
     const count = await Classe.count({ where: { id: uniqueIds } });
+
     if (count !== uniqueIds.length) {
       throw badRequest('Una o più classi non esistono', 'INVALID_CLASSES');
     }
@@ -199,9 +230,15 @@ export class PrenotazioniService {
       ora_fine: { [Op.gt]: slot.ora_inizio },
     };
 
-    if (excludeId) where['id'] = { [Op.ne]: excludeId };
+    if (excludeId) {
+      where['id'] = { [Op.ne]: excludeId };
+    }
 
-    const existing = await Prenotazione.findOne({ where, ...(transaction ? { transaction } : {}) });
+    const existing = await Prenotazione.findOne({
+      where,
+      ...(transaction ? { transaction } : {}),
+    });
+
     if (existing) {
       throw conflict('Aula già prenotata in questa fascia oraria', 'OVERLAP', {
         prenotazione_id: existing.id,

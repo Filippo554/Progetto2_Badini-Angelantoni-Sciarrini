@@ -73,6 +73,5 @@ export const prenotazioniQuerySchema = z.object({
   aulaId: z.coerce.number().int().positive().optional(),
   classeId: z.coerce.number().int().positive().optional(),
   data: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  dataDa: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  dataA: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  settimana: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 });
