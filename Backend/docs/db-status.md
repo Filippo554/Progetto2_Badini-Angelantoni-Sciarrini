@@ -1,48 +1,72 @@
-# Database Status - Backend Prenotazione Aule
+# Database Status – Backend Prenotazione Aule
 
 ## Stato attuale del database
 
-Il progetto prevede l’utilizzo di un database relazionale PostgreSQL per la gestione persistente dei dati relativi a utenti, aule, classi e prenotazioni.
+Il progetto prevede l’utilizzo di un database relazionale per la gestione persistente delle informazioni relative a utenti, aule, classi e prenotazioni.
 
-Al momento della stesura di questo documento, il database **non è ancora stato completamente integrato**, in quanto la definizione finale dello schema e degli script di inizializzazione è in fase di sviluppo da parte del gruppo dedicato alla progettazione del database.
+Nella versione attuale dell’applicazione, il database non è ancora completamente integrato. La definizione finale dello schema logico e degli script di inizializzazione è in fase di sviluppo da parte del gruppo incaricato della progettazione del database.
 
-## Configurazione backend (Sequelize)
+---
 
-Nel backend è già stata predisposta la configurazione iniziale di Sequelize come ORM per la gestione del database.
+## Configurazione del backend (Sequelize)
 
-Sono presenti:
-- configurazione della connessione tramite variabili d’ambiente (`.env`)
-- struttura del file di inizializzazione del database
-- preparazione alla definizione dei modelli (models)
-- predisposizione della connessione asincrona al DB
+Nel backend è già stata predisposta la configurazione di Sequelize come ORM (Object Relational Mapper), al fine di gestire in modo strutturato l’interazione con il database.
 
-Questa configurazione permette una futura integrazione immediata con PostgreSQL senza modifiche strutturali al codice del backend.
+In particolare, sono già presenti:
+
+* configurazione della connessione tramite variabili d’ambiente (`.env`);
+* inizializzazione asincrona della connessione al database;
+* struttura di base per la definizione dei modelli (models);
+* organizzazione modulare delle entità principali (utenti, aule, classi, prenotazioni).
+
+Questa configurazione consente un’integrazione rapida e senza modifiche strutturali al codice applicativo una volta disponibile lo schema definitivo del database.
+
+---
 
 ## Stato attuale dell’applicazione
 
-In attesa dell’integrazione con il database, il sistema utilizza:
-- strutture dati temporanee in memoria (array JavaScript/TypeScript)
-- dati mock per la gestione delle aule
-- API REST già funzionanti e testabili tramite HTTP
-
-Questo approccio consente lo sviluppo parallelo del backend e del database senza blocchi operativi.
-
-## Compatibilità futura
-
-Il backend è progettato per essere completamente compatibile con il database relazionale finale.
+In assenza del database persistente, il sistema utilizza strutture dati temporanee in memoria per simulare il comportamento del sistema reale.
 
 In particolare:
-- le entità sono già separate in moduli logici (aule, prenotazioni, utenti)
-- le API seguono una struttura REST coerente con le future query SQL
-- la logica di business è indipendente dal livello di persistenza
 
-## Obiettivo della fase attuale
+* utilizzo di array JavaScript/TypeScript come storage temporaneo;
+* impiego di dati mock per la gestione delle aule e delle prenotazioni;
+* API REST completamente funzionanti e testabili tramite richieste HTTP.
 
-L’obiettivo di questa fase è:
-- completare l’implementazione delle API REST principali
-- definire la logica di business (in particolare gestione prenotazioni e conflitti orari)
-- preparare l’integrazione con PostgreSQL non appena disponibile lo schema definitivo
+Questo approccio consente di sviluppare e validare la logica applicativa indipendentemente dal livello di persistenza dei dati.
 
-## Nota tecnica
+---
 
-L’attuale architettura permette una transizione “plug-in” verso il database reale senza necessità di riscrivere le route o la logica del controller.
+## Architettura e compatibilità futura
+
+Il backend è stato progettato seguendo un’architettura modulare che separa chiaramente:
+
+* logica di business;
+* gestione delle richieste HTTP (route e controller);
+* livello di accesso ai dati (ORM/database).
+
+Grazie a questa separazione, la logica applicativa risulta indipendente dal database utilizzato.
+
+Di conseguenza, l’integrazione con il database relazionale definitivo potrà avvenire in modo “plug-in”, senza necessità di riscrivere:
+
+* le route;
+* i controller;
+* la logica di gestione delle prenotazioni.
+
+---
+
+## Obiettivi della fase attuale
+
+Gli obiettivi principali della fase corrente di sviluppo sono:
+
+* completare l’implementazione delle API REST principali;
+* definire e validare la logica di business, con particolare attenzione alla gestione delle prenotazioni e dei conflitti orari;
+* predisporre il sistema per l’integrazione con il database relazionale.
+
+---
+
+## Considerazioni finali
+
+L’approccio adottato consente uno sviluppo parallelo tra backend e database, evitando blocchi operativi e permettendo una validazione progressiva delle funzionalità.
+
+La struttura attuale garantisce una transizione fluida verso il database definitivo, mantenendo coerenza, scalabilità e manutenibilità del sistema.

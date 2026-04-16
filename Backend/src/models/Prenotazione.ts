@@ -4,7 +4,6 @@ import {
   InferAttributes,
   InferCreationAttributes,
   CreationOptional,
-  ForeignKey,
   NonAttribute,
   Sequelize,
   BelongsToManySetAssociationsMixin,
@@ -21,11 +20,14 @@ export class Prenotazione extends Model<
   InferCreationAttributes<Prenotazione>
 > {
   declare id: CreationOptional<number>;
-  declare utente_id: ForeignKey<number> | null;
-  declare aula_id: ForeignKey<number>;
+
+  declare utente_id: number | null;
+  declare aula_id: number;
+
   declare data: string;
   declare ora_inizio: string;
   declare ora_fine: string;
+
   declare note: CreationOptional<string | null>;
   declare created_at: CreationOptional<Date>;
 
@@ -69,19 +71,30 @@ export class Prenotazione extends Model<
         data: {
           type: DataTypes.DATEONLY,
           allowNull: false,
+          validate: {
+            notEmpty: true,
+          },
         },
 
         ora_inizio: {
           type: DataTypes.TIME,
           allowNull: false,
+          validate: {
+            notEmpty: true,
+          },
         },
 
         ora_fine: {
           type: DataTypes.TIME,
           allowNull: false,
           validate: {
+            notEmpty: true,
+
             isAfterStart(this: Prenotazione, value: string) {
-              if (value <= this.ora_inizio) {
+              const start = new Date(`1970-01-01T${this.ora_inizio}`);
+              const end = new Date(`1970-01-01T${value}`);
+
+              if (end <= start) {
                 throw new Error("ora_fine deve essere maggiore di ora_inizio");
               }
             },

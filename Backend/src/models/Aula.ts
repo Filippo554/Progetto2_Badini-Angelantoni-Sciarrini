@@ -14,8 +14,8 @@ export class Aula extends Model<
   declare id: CreationOptional<number>;
   declare numero: number;
   declare capienza: CreationOptional<number>;
-  declare descrizione: CreationOptional<string | null>;
-  declare piano: CreationOptional<number | null>;
+  declare descrizione: CreationOptional<string>;
+  declare piano: CreationOptional<number>;
 
   static initModel(sequelize: Sequelize): typeof Aula {
     Aula.init(
@@ -31,6 +31,7 @@ export class Aula extends Model<
           allowNull: false,
           unique: true,
           validate: {
+            isInt: true,
             min: 1,
             max: 119,
           },
@@ -41,6 +42,7 @@ export class Aula extends Model<
           allowNull: false,
           defaultValue: 30,
           validate: {
+            isInt: true,
             min: 1,
           },
         },
@@ -59,7 +61,13 @@ export class Aula extends Model<
         sequelize,
         tableName: "aula",
         timestamps: false,
-        paranoid: false,
+
+        indexes: [
+          {
+            unique: true,
+            fields: ["numero"],
+          },
+        ],
       }
     );
 

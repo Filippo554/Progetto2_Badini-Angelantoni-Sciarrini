@@ -7,17 +7,25 @@ export async function checkOwner(
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id <= 0) {
+    res.status(400).json({
+      error: "ID non valido",
+      code: "INVALID_ID",
+    });
+    return;
+  }
+
+  if (!req.user) {
+    res.status(401).json({
+      error: "Non autenticato",
+      code: "UNAUTHORIZED",
+    });
+    return;
+  }
+
   try {
-    const id = Number(req.params.id);
-
-    if (!Number.isInteger(id) || id < 1) {
-      res.status(400).json({
-        error: "ID prenotazione non valido",
-        code: "INVALID_ID",
-      });
-      return;
-    }
-
     const prenotazione = await Prenotazione.findByPk(id);
 
     if (!prenotazione) {
@@ -28,24 +36,14 @@ export async function checkOwner(
       return;
     }
 
-    if (!req.user) {
-      res.status(401).json({
-        error: "Non autenticato",
-        code: "UNAUTHORIZED",
-      });
-      return;
-    }
-
-    const { user } = req;
-
-    if (user.ruolo === "admin") {
+    if (req.user.ruolo === "admin") {
       next();
       return;
     }
 
-    if (prenotazione.utente_id !== user.id) {
+    if (prenotazione.utente_id !== req.user.id) {
       res.status(403).json({
-        error: "Non hai i permessi per questa operazione",
+        error: "Non autorizzato",
         code: "FORBIDDEN",
       });
       return;
@@ -54,7 +52,7 @@ export async function checkOwner(
     next();
   } catch {
     res.status(500).json({
-      error: "Errore interno nel controllo permessi",
+      error: "Errore nel controllo ownership",
       code: "CHECK_OWNER_ERROR",
     });
   }

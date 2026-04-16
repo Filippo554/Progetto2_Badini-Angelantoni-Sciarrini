@@ -1,71 +1,92 @@
-# 📚 Progetto2 - Badini, Angelantoni, Sciarrini
+# 📚 Progetto2 – Sistema di Prenotazione Aule
+
+**Badini · Angelantoni · Sciarrini**
 
 ## 📌 Descrizione
 
 Applicazione web full-stack sviluppata a scopo didattico per la gestione delle **prenotazioni delle aule scolastiche**.
 
-Il sistema permette di:
+Il sistema consente di:
 
-* visualizzare le aule disponibili
-* creare e gestire prenotazioni
-* associare classi alle prenotazioni
-* gestire utenti con ruoli differenti (studente, docente, ATA, admin)
-* applicare controlli di sicurezza e autorizzazione
+* visualizzare lo stato di occupazione delle aule;
+* creare, modificare ed eliminare prenotazioni;
+* associare una o più classi a una prenotazione;
+* gestire utenti con ruoli differenti (studente, docente, ATA, amministratore);
+* applicare controlli di sicurezza, autorizzazione e validazione dei dati.
 
-Il progetto è composto da:
+L’applicazione è progettata secondo un’architettura modulare, che separa chiaramente frontend, backend e database.
 
-* **Frontend** (Angular)
-* **Backend** (Node.js + Express + TypeScript)
-* **Database** (MySQL)
-
----
 
 ## 🧱 Struttura del progetto
 
-### 📁 Frontend
+### 📁 Frontend (`Frontend/`)
 
-Cartella: `Frontend/`
-
-* Applicazione Angular (SPA)
+* Applicazione **Angular (SPA)**
 * Rendering lato client (CSR)
-* Comunicazione con backend tramite API REST
+* Comunicazione con il backend tramite API REST
+* Visualizzazione prenotazioni:
 
----
+  * giornaliera
+  * settimanale
+  * calendario
 
-### 📁 Backend
+### 📁 Backend (`Backend/`)
 
-Cartella: `Backend/`
+Tecnologie:
+
+* Node.js
+* Express
+* TypeScript
+* Sequelize (ORM)
+* Zod (validazione dati)
 
 Struttura principale:
 
 * `src/`
 
-  * `index.ts` → avvio server Express
-  * `db/` → configurazione database (Sequelize)
-  * `models/` → modelli ORM
-  * `routes/` → endpoint API
-  * `middleware/` → autenticazione e sicurezza
-  * `types/` → estensioni TypeScript
+  * `index.ts` → avvio server
+  * `db/` → configurazione database
+  * `models/` → modelli Sequelize
+  * `routes/` → endpoint REST
+  * `middleware/` → autenticazione, autorizzazione, validazione
+  * `schemas/` → validazione input con Zod
+  * `services/` → logica di business
+  * `utils/` → funzioni di supporto
+  * `types/` → tipi personalizzati TypeScript
+  * `websocket/` → gestione comunicazione realtime
+  * `tests/` → test automatici
+  (I test sono mantenuti dentro src per avere accesso diretto ai moduli TypeScript e semplificare l’integrazione con la logica applicativa.)
 
-Architettura adottata:
+Architettura:
 
-```id="arch1"
-Routes → Middleware → Models → Database
-```
+Routes → Middleware → Services → Models → Database
+                ↓
+             Schemas
 
----
+Questa struttura garantisce:
 
-### 📁 Database
+* separazione delle responsabilità
+* manutenibilità
+* testabilità
+* scalabilità
 
-Cartella: `Database/script/`
+### 📁 Database (`Database/script/`)
 
-Contiene gli script SQL:
+Database relazionale implementato in **MySQL**.
 
+Script disponibili:
+
+* `create_db.sql` → creazione database (DDL)
 * `schema.sql` → creazione tabelle (DDL)
-* `seed.sql` → dati iniziali
+* `seed.sql` → popolamento dati iniziali
 * `reset.sql` → reset completo database
 
----
+Caratteristiche:
+
+* entità: utenti, aule, classi, prenotazioni
+* relazione molti-a-molti tra prenotazioni e classi
+* vincoli di integrità referenziale (foreign key)
+* dati realistici per test e dimostrazione
 
 ## ⚙️ Tecnologie utilizzate
 
@@ -80,100 +101,100 @@ Contiene gli script SQL:
 * Node.js
 * Express
 * TypeScript
-* Sequelize (ORM)
+* Sequelize
+* Zod
 
 ### Database
 
 * MySQL
 * MySQL Workbench / phpMyAdmin
 
----
 
-## 🔐 Sicurezza
+## 🔐 Sicurezza e controlli applicativi
 
-Il backend implementa:
+### 🔑 Autenticazione
 
-* Autenticazione tramite **JWT**
-* Middleware:
+* Basata su **JWT (JSON Web Token)**
 
-  * `authMiddleware` → verifica token
-  * `roleMiddleware` → controllo ruoli
-  * `checkOwner` → verifica proprietà delle risorse
-* Gestione centralizzata degli errori
+### 🛡️ Autorizzazione
 
----
+Controllo accessi basato su ruolo:
+
+* **studente** → sola visualizzazione
+* **docente / ATA** → gestione delle proprie prenotazioni
+* **admin** → accesso completo
+
+### 🔎 Validazione dati
+
+* Validazione tramite **Zod**
+* Controllo formato e coerenza input
+
+### ⚠️ Controlli di business
+
+* verifica sovrapposizione prenotazioni sulla stessa aula
+* controllo proprietà delle prenotazioni
+* gestione relazione prenotazioni ↔ classi
+
+
+## 📊 Funzionalità principali
+
+* CRUD Aule
+* CRUD Classi
+* CRUD Prenotazioni
+* Associazione N:M Prenotazioni ↔ Classi
+* Filtro prenotazioni per:
+
+  * data (giornaliero / settimanale)
+  * aula
+  * classe
+* Controllo sovrapposizione oraria
+* Gestione utenti e ruoli
+* Protezione API con JWT
+* Validazione input con Zod
+* Test automatici su logiche critiche
+* Predisposizione comunicazione realtime (WebSocket)
+
 
 ## 🚀 Avvio del progetto
 
 ### ▶️ 1. Database (MySQL)
 
-1. Avviare MySQL
-2. Aprire MySQL Workbench (o phpMyAdmin)
-3. Creare un database:
-
-```sql id="db1"
 CREATE DATABASE prenotazione_aule;
-```
-
-4. Selezionare il database ed eseguire:
-
-```sql id="db2"
 USE prenotazione_aule;
-```
 
-5. Eseguire gli script nell’ordine:
+Eseguire gli script nell’ordine:
 
-```sql id="db3"
 reset.sql
 schema.sql
 seed.sql
-```
 
----
 
 ### ▶️ 2. Backend
 
-```bash id="be1"
 cd Backend
 npm install
+npm run build
 npm run dev
-```
+
 
 Server disponibile su:
-
-```id="be2"
 http://localhost:3000
-```
 
-Health check:
-
-```id="be3"
-http://localhost:3000/
-```
-
----
 
 ### ▶️ 3. Frontend
 
-```bash id="fe1"
 cd Frontend
 npm install
 ng serve
-```
+
 
 Applicazione disponibile su:
 
-```id="fe2"
 http://localhost:4200
-```
-
----
 
 ## 🔗 Configurazione ambiente
 
 File `.env` (Backend):
-
-```env id="env1"
 PORT=3000
 
 DB_HOST=localhost
@@ -185,36 +206,23 @@ DB_PASSWORD=password
 JWT_SECRET=INSERIRE_UN_SECRET_SICURO
 
 FRONTEND_URL=http://localhost:4200
-```
-
----
-
-## 📊 Funzionalità principali
-
-* CRUD Aule
-* CRUD Classi
-* CRUD Prenotazioni
-* Relazione N:M Prenotazioni ↔ Classi
-* Controllo sovrapposizione prenotazioni
-* Gestione utenti e ruoli
-* Protezione API con JWT
-
----
 
 ## 📌 Stato del progetto
 
 ✔ Backend completo e strutturato
-✔ Database progettato e funzionante
-✔ API REST protette
-✔ Frontend configurato
+✔ Database progettato e coerente con i requisiti
+✔ API REST funzionanti e protette
+✔ Validazione dati implementata
+✔ Seed database completo
+✔ Test automatici presenti
 
-🚧 Miglioramenti possibili:
+🚧 Possibili miglioramenti:
 
-* login completo (JWT / OAuth)
-* documentazione API
-* test automatici
+* integrazione completa autenticazione Google OAuth
+* documentazione API (Swagger/OpenAPI)
+* ampliamento test automatici
+* ottimizzazione performance query
 
----
 
 ## 👥 Autori
 
@@ -222,14 +230,14 @@ FRONTEND_URL=http://localhost:4200
 * Angelantoni
 * Sciarrini
 
----
+## 🏆 Considerazioni finali
 
-## 🏆 Note finali
+Il progetto è stato sviluppato seguendo buone pratiche di ingegneria del software:
 
-Il progetto è stato sviluppato seguendo buone pratiche di progettazione:
+* separazione delle responsabilità (layered architecture)
+* validazione robusta dei dati
+* gestione sicura dei permessi
+* progettazione coerente del database
+* utilizzo di strumenti moderni (ORM, validazione schema-based)
 
-* separazione delle responsabilità
-* validazione dei dati
-* sicurezza delle API
-
-Struttura modulare e facilmente estendibile.
+La struttura modulare rende il sistema facilmente estendibile e manutenibile.
