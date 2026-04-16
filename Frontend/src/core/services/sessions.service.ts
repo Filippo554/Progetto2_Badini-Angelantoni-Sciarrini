@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 
 @Injectable({ providedIn: 'root' })
 export class GoogleSession {
-    private readonly clientId = '610359570962-mf8sfiilrkn2bh606qe1t61b17l4n8jf.apps.googleusercontent.com';
+    private readonly clientId = '40793856505-sji9m02p836aktn626pflonnqa80vkvh.apps.googleusercontent.com';
     private credentials = '';
 
     public get sessionClientId(): string {
