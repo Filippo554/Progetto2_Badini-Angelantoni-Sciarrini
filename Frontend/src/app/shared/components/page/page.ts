@@ -1,9 +1,8 @@
-import { Component, Input, inject } from "@angular/core";
-import { OnInit } from "@angular/core";
+import { Component, Input, inject, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 
 import { HeaderComponent } from "../header/header";
-import { UserService } from "../../../../core/services/user.service";
+import { BackendSession } from "../../../../core/services/sessions.service";
 
 @Component({
     selector: 'app-component-page',
@@ -11,13 +10,15 @@ import { UserService } from "../../../../core/services/user.service";
     styleUrl: './page.css',
     imports: [HeaderComponent],
 })
-export class Page implements OnInit{
+export class Page implements OnInit {
     router = inject(Router);
-    user = inject(UserService);
+    backendSession = inject(BackendSession);
+
+    @Input() headertype: string = "first";
+
     ngOnInit() {
-        if (!this.user.is && this.router.url !== '/login') {
+        if (!this.backendSession.sessionToken && this.router.url !== '/login') {
             this.router.navigate(['/login']);
         }
     }
-    @Input() headertype: string = "first";
 }

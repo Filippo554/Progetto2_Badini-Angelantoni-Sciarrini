@@ -1,6 +1,9 @@
-import {Component} from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { Page } from '../../../shared/components/page/page';
+import { HttpService } from '../../../../core/services/http.service';
+import { BackendSession } from '../../../../core/services/sessions.service';
 
 @Component({
     selector: 'app-detail',
@@ -9,12 +12,41 @@ import { Page } from '../../../shared/components/page/page';
     imports: [Page],
 })
 export class Detail {
-    prenotation = {
-        classes: [ {id: 0, c: '5BIA'}, {id: 1, c: '5CIA'}, {id: 2, c: '5DIA'} ],
-        room: 119,
-        date: '17/04/2026',
-        start: '08:00',
-        end: '10:00',
-        teacher: 'Ferraro Patrizia'
+    httpService = inject(HttpService);
+    route = inject(ActivatedRoute);
+    backendSession = inject(BackendSession);
+    
+    prenotation: any = null;
+    errorMessage = '';
+
+    async ngOnInit() {
+        const token = this.backendSession.sessionToken;
+        const id = Number(this.route.snapshot.queryParamMap.get('id'));
+
+        if (!token || !id) {
+            this.errorMessage = 'Dettaglio non disponibile.';
+            return;
+        }
+
+        try {
+            const data = await this.httpService.getPrenotationById(token, id);
+
+            this.prenotation = {
+                classes: (data.classi ?? []).map((c: any, index: number) => ({
+                    id: index,
+                    c: c.nome
+                })),
+                room: data.aula?.numero ?? '',
+                date: data.data ?? '',
+                start: String(data.ora_inizio ?? '').slice(0, 5),
+                end: String(data.ora_fine ?? '').slice(0, 5),
+                teacher: data.utente
+                    ? `${data.utente.cognome} ${data.utente.nome}`
+                    : 'N/D'
+            };
+        } catch (error) {
+            console.error(error);
+            this.errorMessage = 'Errore caricamento dettaglio.';
+        }
     }
 }

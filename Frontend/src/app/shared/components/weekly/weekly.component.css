@@ -32,8 +32,9 @@ thead > .l1 > td > span {
     margin: 0;
     padding: 0;
     height: 100%;
-    width: 326px;
+    width: 420px;
     box-sizing: border-box;
+    align-items: center;
 }
 thead > .l1 > td > span > button {
     display: block;
@@ -53,19 +54,21 @@ thead > .l1 > td > span > button {
 
 thead > .l1 > td > span > p {
     display: block;
-    flex: 4;
+    flex: 1;
     margin: auto 20px;
-    padding: 0;
+    padding: 0 8px;
     height: 33px;
     background-color: var(--input-bg-color);
     color: var(--color);
     border: solid var(--border-color) 1px;
     border-radius: 10px;
-    font-size: 25px;
+    font-size: 18px;
     font-family: Calibri;
     line-height: 33px;
     box-sizing: border-box;
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 thead > .l2 > th {
@@ -109,14 +112,6 @@ tbody > tr > td {
 }
 tbody > tr > td:last-child {
     border: none;
-}
-tbody > tr:last-child {
-    position: absolute;
-    top: 0;
-    height: 100%;
-}
-tbody > tr:last-child > td {
-    height: 100%;
 }
 
 tbody > tr > td > div {

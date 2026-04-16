@@ -22,7 +22,6 @@ export class WebsocketService {
     const token = this.backendSession.sessionToken;
 
     if (!token) {
-      console.error('Token backend mancante: impossibile aprire il websocket');
       return;
     }
 
@@ -31,19 +30,15 @@ export class WebsocketService {
     }
 
     this.socket = io('http://localhost:3000', {
-      auth: {
-        token,
-      },
+      auth: { token },
       transports: ['websocket'],
     });
 
     this.socket.on('connect', () => {
-      console.log('Socket.IO connesso');
       this.connectionStatusSubject.next(true);
     });
 
     this.socket.on('disconnect', () => {
-      console.log('Socket.IO disconnesso');
       this.connectionStatusSubject.next(false);
     });
 
@@ -66,15 +61,9 @@ export class WebsocketService {
   }
 
   disconnect(): void {
-    if (this.socket) {
-      this.socket.disconnect();
-      this.socket = null;
-      this.connectionStatusSubject.next(false);
-    }
-  }
-
-  isConnected(): boolean {
-    return !!this.socket?.connected;
+    this.socket?.disconnect();
+    this.socket = null;
+    this.connectionStatusSubject.next(false);
   }
 
   joinAula(aulaId: number): void {
@@ -83,11 +72,5 @@ export class WebsocketService {
 
   leaveAula(aulaId: number): void {
     this.socket?.emit('leave:aula', aulaId);
-  }
-
-  ping(): void {
-    this.socket?.emit('ping', (response: string) => {
-      console.log('Ping response:', response);
-    });
   }
 }

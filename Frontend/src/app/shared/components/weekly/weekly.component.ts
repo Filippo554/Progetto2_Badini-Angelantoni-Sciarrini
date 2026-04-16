@@ -27,57 +27,58 @@ export class WeeklyComponent {
     @Input() width: string = "800";
     @Input() height: string = "550";
     @Input() type: string = "full";
+
     week = 3;
     weeks = [
         {
             days: '06-12',
             monday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
             tuesday:   [ { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            wednesday: [ { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
+            wednesday: [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
             thursday:  [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            friday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            saturday:  [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            sunday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
+            friday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
+            saturday:  [],
+            sunday:    [],
         },
         {
             days: '13-19',
             monday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            tuesday:   [ { hours: '08:00-09:00', class: '5BIA', room: '119' }, { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            wednesday: [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
+            tuesday:   [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
+            wednesday: [],
             thursday:  [],
             friday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            saturday:  [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            sunday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
+            saturday:  [],
+            sunday:    [],
         },
         {
             days: '20-26',
-            monday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            tuesday:   [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            wednesday: [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            thursday:  [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            friday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            saturday:  [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
+            monday:    [],
+            tuesday:   [],
+            wednesday: [],
+            thursday:  [],
+            friday:    [],
+            saturday:  [],
             sunday:    [],
         },
         {
             days: '27-03',
             monday:    [],
             tuesday:   [],
-            wednesday: [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            thursday:  [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
+            wednesday: [],
+            thursday:  [],
             friday:    [],
-            saturday:  [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            sunday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
+            saturday:  [],
+            sunday:    [],
         },
         {
             days: '04-10',
-            monday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            tuesday:   [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            wednesday: [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            thursday:  [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            friday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            saturday:  [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
-            sunday:    [ { hours: '08:00-09:00', class: '5BIA', room: '119' } ],
+            monday:    [],
+            tuesday:   [],
+            wednesday: [],
+            thursday:  [],
+            friday:    [],
+            saturday:  [],
+            sunday:    [],
         },
     ];
 
@@ -85,6 +86,10 @@ export class WeeklyComponent {
 
     ngOnInit() {
         this.rows = this.getRows();
+    }
+
+    get weekLabel(): string {
+        return `2026-04-${this.weeks[this.week].days.replace('-', ' / 2026-04-')}`;
     }
 
     asSlot(val: Slot | string): Slot {

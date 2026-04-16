@@ -1,43 +1,73 @@
 <app-component-page>
-    <table>
-        <thead>
-            <tr>
-                <th>search</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (p of prenotations; track p.id) {
-                <tr><td>{{p.hours}}</td><td>{{p.class}}</td><td>{{p.room}}</td></tr>
-            }
-        </tbody>
-    </table>
-    <form>
-        <label>filters</label>
-        <span>
-            <section>
-                <label>class</label>
-                <select>
-                    @for (c of classes; track c.c) {
-                        <option value="{{c.c}}">{{c.c}}</option>
-                    }
-                </select>
-            </section>
-            <section>
-                <label>room</label>
-                <select>
-                    @for (r of rooms; track r.n) {
-                        <option value="{{r.n}}">{{r.n}}</option>
-                    }
-                </select>
-            </section>
-            <section>
-                <label>hours</label>
-                <span>
-                    <input type="time">
-                    <input type="time">
-                </span>
-            </section>
-            <input type="submit">
-        </span>
-    </form>
+    @if (isLoading) {
+        <p>Caricamento...</p>
+    }
+
+    @if (errorMessage) {
+        <p>{{ errorMessage }}</p>
+    }
+
+    @if (!isLoading) {
+        <form (ngSubmit)="applyFilters()">
+            <label>filters</label>
+
+            <span>
+                <section>
+                    <label for="classFilter">class</label>
+                    <select id="classFilter" name="classFilter" [(ngModel)]="selectedClass">
+                        <option value="">all</option>
+                        @for (c of classes; track c.c) {
+                            <option [value]="c.c">{{ c.c }}</option>
+                        }
+                    </select>
+                </section>
+
+                <section>
+                    <label for="roomFilter">room</label>
+                    <select id="roomFilter" name="roomFilter" [(ngModel)]="selectedRoom">
+                        <option value="">all</option>
+                        @for (r of rooms; track r.n) {
+                            <option [value]="r.n">{{ r.n }}</option>
+                        }
+                    </select>
+                </section>
+
+                <section>
+                    <label>hours</label>
+                    <span>
+                        <input type="time" name="startHour" [(ngModel)]="selectedStartHour">
+                        <input type="time" name="endHour" [(ngModel)]="selectedEndHour">
+                    </span>
+                </section>
+
+                <button type="submit">apply</button>
+                <button type="button" (click)="resetFilters()">reset</button>
+            </span>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>hours</th>
+                    <th>classes</th>
+                    <th>room</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (p of pr; track p.id) {
+                    <tr (click)="openDetail(p.id)">
+                        <td>{{ p.hours }}</td>
+                        <td>{{ p.classes }}</td>
+                        <td>{{ p.room }}</td>
+                    </tr>
+                }
+
+                @if (pr.length === 0) {
+                    <tr>
+                        <td colspan="3">Nessun risultato trovato.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </app-component-page>

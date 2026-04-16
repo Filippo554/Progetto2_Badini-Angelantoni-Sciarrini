@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { createServer } from 'http';
+
 import { testDatabaseConnection } from './db/database';
 import './models';
 import auleRoutes from './routes/aule.routes';
@@ -10,10 +12,12 @@ import utentiRoutes from './routes/utente.routes';
 import authRoutes from './routes/auth.routes';
 import { errorMiddleware, notFoundHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/request-logger.middleware';
+import { initWebSocket } from './websocket';
 
 dotenv.config();
 
 const app = express();
+const httpServer = createServer(app);
 
 app.use(
   cors({
@@ -45,7 +49,10 @@ const PORT = Number(process.env.PORT || 3000);
 async function bootstrap(): Promise<void> {
   try {
     await testDatabaseConnection();
-    app.listen(PORT, () => {
+
+    initWebSocket(httpServer);
+
+    httpServer.listen(PORT, () => {
       console.log(`Server avviato su http://localhost:${PORT}`);
     });
   } catch (error) {

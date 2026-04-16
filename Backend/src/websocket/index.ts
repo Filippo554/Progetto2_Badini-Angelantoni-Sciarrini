@@ -1,10 +1,10 @@
 const { Server: SocketIOServer } = require("socket.io");
 import { Server as HttpServer } from "http";
-
 import jwt from "jsonwebtoken";
 
 import { WSUser } from "./types";
 import { WS_EVENTS } from "./events";
+import { handleConnection } from "./handlers";
 
 type JwtDecoded = {
   id: number;
@@ -43,7 +43,7 @@ function verifyToken(token: string): WSUser {
 export function initWebSocket(server: HttpServer): any {
   io = new SocketIOServer(server, {
     cors: {
-      origin: "*",
+      origin: process.env.FRONTEND_URL || "http://localhost:4200",
       methods: ["GET", "POST"],
     },
   });
@@ -59,7 +59,6 @@ export function initWebSocket(server: HttpServer): any {
       }
 
       const user = verifyToken(token);
-
       (socket as any).user = user;
 
       return next();
@@ -69,21 +68,7 @@ export function initWebSocket(server: HttpServer): any {
   });
 
   io.on("connection", (socket: any) => {
-    const user = (socket as any).user as WSUser | undefined;
-
-    if (!user) {
-      socket.disconnect();
-      return;
-    }
-
-    socket.join(`user:${user.id}`);
-
-    if (user.ruolo === "admin") {
-      socket.join("admins");
-    }
-
-    socket.on("disconnect", () => {
-    });
+    handleConnection(socket, io);
   });
 
   return io;
@@ -104,12 +89,4 @@ export function emitPrenotazioneAggiornata(data: unknown) {
 
 export function emitPrenotazioneEliminata(id: number) {
   getIO().emit(WS_EVENTS.PRENOTAZIONE_DELETED, { id });
-}
-
-export function emitAulaCreata(data: unknown) {
-  getIO().emit(WS_EVENTS.AULA_CREATED, data);
-}
-
-export function emitClasseCreata(data: unknown) {
-  getIO().emit(WS_EVENTS.CLASSE_CREATED, data);
 }

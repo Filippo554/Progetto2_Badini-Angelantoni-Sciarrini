@@ -1,62 +1,47 @@
 import { Injectable } from "@angular/core";
 
 @Injectable({ providedIn: 'root' })
-export class SessionService {
-    private GOOGLE_CLIENT_ID = '610359570962-mf8sfiilrkn2bh606qe1t61b17l4n8jf.apps.googleusercontent.com';
-
-    private GOOGLE_CLIENT_CREDENTIALS = '';
-    private SESSION_TOKEN = '';
-
-    public get_client_id() {
-        return this.GOOGLE_CLIENT_ID;
-    }
-    public get_credentials() {
-        return this.GOOGLE_CLIENT_CREDENTIALS;
-    }
-    public set_credentials(credentials: string) {
-        this.GOOGLE_CLIENT_CREDENTIALS = credentials;
-        return 0;
-    }
-    public get_session_token() {
-        return this.SESSION_TOKEN;
-    }
-    public set_session_token(token: string) {
-        this.SESSION_TOKEN = token;
-        return 0;
-    }
-}
-
-@Injectable({ providedIn: 'root' })
 export class GoogleSession {
-    private clientId = '610359570962-mf8sfiilrkn2bh606qe1t61b17l4n8jf.apps.googleusercontent.com';
-    private credentials!: string;
+    private readonly clientId = '610359570962-mf8sfiilrkn2bh606qe1t61b17l4n8jf.apps.googleusercontent.com';
+    private credentials = '';
+
+    public get sessionClientId(): string {
+        return this.clientId;
+    }
 
     public set sessionCredentials(cred: string) {
         this.credentials = cred;
     }
-    public get sessionCredentials() {
+
+    public get sessionCredentials(): string {
         return this.credentials;
     }
 }
+
 @Injectable({ providedIn: 'root' })
 export class BackendSession {
+    private readonly storageKey = 'backend_token';
     private token: string | null = null;
     
-    public get sessionToken() {
-        if (this.token !== null) {
-            return this.token;
-        } else {
-            return '';
-        }
+    constructor() {
+        this.token = sessionStorage.getItem(this.storageKey);
+    }
+
+    public get sessionToken(): string {
+        return this.token ?? '';
     }
 
     public initialize(token: string): void {
         this.token = token;
+        sessionStorage.setItem(this.storageKey, token);
     }
+
     public clear(): void {
         this.token = null;
+        sessionStorage.removeItem(this.storageKey);
     }
+
     public isNull(): boolean {
-        return this.token === null;
+        return this.token === null || this.token === '';
     }
 }

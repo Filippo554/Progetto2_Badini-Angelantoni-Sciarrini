@@ -4,13 +4,13 @@
         <ul>
             <li (click)="togglelist()">
                 <span>
-                    <p>{{name}} {{surname}}</p>
+                    <p>{{ fullName }}</p>
                     <img ngSrc="images/temp.png" width="70" height="70" />
                 </span>
             </li>
             <li [style.display]="cascadelist">
                 <ul>
-                    <li (click)="toggle()"><p>{{theme}}</p></li>
+                    <li (click)="toggle()"><p>{{ theme }}</p></li>
                 </ul>
             </li>
         </ul>

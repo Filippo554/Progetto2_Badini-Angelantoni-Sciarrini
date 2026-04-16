@@ -14,23 +14,23 @@ import { UserService } from '../../../../core/services/user.service';
 })
 export class HeaderComponent {
     @Input() type: string = "first";
+
     user = inject(UserService);
     themeService = inject(ThemeService);
     theme = (this.themeService.isDark()) ? 'dark' : 'light';
+
+    cascadelist = "none";
+
     toggle() {
         this.themeService.toggle();
         this.theme = (this.themeService.isDark()) ? 'dark' : 'light';
     }
-    
-    cascadelist = "none";
-    name = this.user.name;
-    surname = this.user.surname;
-    
+
     togglelist() {
-        if (this.cascadelist === "none") {
-            this.cascadelist = "block";
-        } else {
-            this.cascadelist = "none";
-        }
+        this.cascadelist = this.cascadelist === "none" ? "block" : "none";
+    }
+
+    get fullName(): string {
+        return `${this.user.name} ${this.user.surname}`.trim();
     }
 }

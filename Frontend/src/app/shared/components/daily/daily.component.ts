@@ -1,4 +1,8 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, inject } from "@angular/core";
+
+import { HttpService } from "../../../../core/services/http.service";
+import { BackendSession } from "../../../../core/services/sessions.service";
+import { WebsocketService } from "../../../../core/services/websocket.service";
 
 @Component({
     selector: 'app-component-daily',
@@ -7,119 +11,67 @@ import { Component, Input } from "@angular/core";
     imports: []
 })
 export class DailyComponent {
+    private http = inject(HttpService);
+    private backendSession = inject(BackendSession);
+    private ws = inject(WebsocketService);
+
     @Input() width: string = "800";
     @Input() height: string = "550";
     @Input() type: string = "full";
-    day_id = 11;
-    days = [
-        { date: '05/04/2006', day: 'Sunday' },
-        { date: '06/04/2006', day: 'Monday' },
-        { date: '07/04/2006', day: 'Tuesday' },
-        { date: '08/04/2006', day: 'Wednesday' },
-        { date: '09/04/2006', day: 'Thursday' },
-        { date: '10/04/2006', day: 'Friday' },
-        { date: '11/04/2006', day: 'Saturday' },
-        { date: '12/04/2006', day: 'Sunday' },
-        { date: '13/04/2006', day: 'Monday' },
-        { date: '14/04/2006', day: 'Tuesday' },
-        { date: '15/04/2006', day: 'Wednesday' },
-        { date: '16/04/2006', day: 'Thursday' },
-        { date: '17/04/2006', day: 'Friday' },
-        { date: '18/04/2006', day: 'Saturday' },
-        { date: '19/04/2006', day: 'Sunday' },
-    ]
-    prenotations = [
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 1, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 1, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 1, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 1, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 1, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 2, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 2, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 2, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 2, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 2, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 2, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 2, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 3, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 3, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 3, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 3, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 4, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 4, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 4, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 4, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 4, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 5, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 5, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 5, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 5, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 5, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 5, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 6, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 6, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 6, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 7, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 7, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 7, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 7, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 7, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 8, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 8, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 8, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 8, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 8, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 9, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 9, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 9, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 10, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 10, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 10, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 11, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 11, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 11, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 11, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 11, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 12, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 12, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 12, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 12, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 13, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 13, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 13, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { day_id: 14, hours: '08:00-09:00', class: '5BIA', room: '119' },
-    ];
-    next() {
-        if (this.day_id+1 < this.days.length) {
-            this.day_id += 1;
-        }
+
+    currentDate = new Date();
+    day_id = 0;
+    days: { date: string; day: string }[] = [{ date: '', day: '' }];
+    prenotations: { day_id: number; hours: string; class: string; room: string }[] = [];
+
+    async ngOnInit(): Promise<void> {
+        this.ws.connect();
+        this.ws.prenotazioniChanged$.subscribe(() => this.loadDay());
+        await this.loadDay();
     }
-    previous() {
-        if (this.day_id-1 >= 0) {
-            this.day_id -= 1;
-        }
+
+    private formatDate(date: Date): string {
+        return date.toISOString().slice(0, 10);
+    }
+
+    private updateHeader(): void {
+        const d = this.currentDate;
+        this.days = [{
+            date: `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`,
+            day: d.toLocaleDateString('en-US', { weekday: 'long' }),
+        }];
+        this.day_id = 0;
+    }
+
+    async loadDay(): Promise<void> {
+        const token = this.backendSession.sessionToken;
+        if (!token) return;
+
+        this.updateHeader();
+
+        const data = await this.http.getPrenotazioni(token, {
+            data: this.formatDate(this.currentDate),
+        });
+
+        this.prenotations = data.map((item: any) => ({
+            day_id: 0,
+            hours: `${item.ora_inizio.slice(0,5)}-${item.ora_fine.slice(0,5)}`,
+            class: (item.classi ?? []).map((c: any) => c.nome).join(', '),
+            room: String(item.aula?.numero ?? ''),
+        }));
+    }
+
+    async next() {
+        const d = new Date(this.currentDate);
+        d.setDate(d.getDate() + 1);
+        this.currentDate = d;
+        await this.loadDay();
+    }
+
+    async previous() {
+        const d = new Date(this.currentDate);
+        d.setDate(d.getDate() - 1);
+        this.currentDate = d;
+        await this.loadDay();
     }
 }

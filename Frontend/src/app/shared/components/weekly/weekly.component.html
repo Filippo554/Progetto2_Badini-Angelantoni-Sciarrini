@@ -5,7 +5,7 @@
                 <td colspan="7">
                     <span>
                         <button (click)="previous()">&lt;</button>
-                        <p>{{ weeks[week].days }}</p>
+                        <p>{{ weekLabel }}</p>
                         <button (click)="next()">&gt;</button>
                     </span>
                 </td>
@@ -103,15 +103,6 @@
                 </td>
             </tr>
         }
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
     </tbody>
     <tfoot>
         <ng-content />

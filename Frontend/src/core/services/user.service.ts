@@ -13,20 +13,31 @@ interface User {
     providedIn: 'root'
 })
 export class UserService {
-    is: boolean = false;
-    id!: number;
-    name!: string;
-    surname!: string;
-    email!: string;
-    role!: string;
-    isActive!: boolean;
+    is = false;
+    id = 0;
+    name = '';
+    surname = '';
+    email = '';
+    role = '';
+    isActive = false;
 
-    init(user: User) {
+    init(user: User): void {
         this.id = user.id;
         this.name = user.nome;
         this.surname = user.cognome;
         this.email = user.email;
         this.role = user.ruolo;
         this.isActive = user.attivo;
+        this.is = true;
+    }
+
+    clear(): void {
+        this.is = false;
+        this.id = 0;
+        this.name = '';
+        this.surname = '';
+        this.email = '';
+        this.role = '';
+        this.isActive = false;
     }
 }

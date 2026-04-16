@@ -1,121 +1,123 @@
-import {Component} from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { Page } from '../../../shared/components/page/page';
+import { HttpService } from '../../../../core/services/http.service';
+import { BackendSession } from '../../../../core/services/sessions.service';
+import { WebsocketService } from '../../../../core/services/websocket.service';
+
+type SearchRow = {
+    id: number;
+    hours: string;
+    startHour: string;
+    endHour: string;
+    classes: string;
+    classesList: string[];
+    room: string;
+};
 
 @Component({
     selector: 'app-search',
     templateUrl: './search.html',
     styleUrl: './search.css',
-    imports: [Page],
+    imports: [Page, FormsModule],
 })
 export class Search {
-    prenotations = [
-        { id: 0, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 1, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 2, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 3, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 4, hours: '08:00-09:00', class: '4AIA', room: '119' },
-        { id: 5, hours: '08:00-09:00', class: '4AIA', room: '119' },
-        { id: 6, hours: '08:00-09:00', class: '4AIA', room: '119' },
-        { id: 7, hours: '08:00-09:00', class: '4AIA', room: '119' },
-        { id: 8, hours: '08:00-09:00', class: '4AIA', room: '119' },
-        { id: 9, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 10, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 11, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 12, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 13, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 14, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 15, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 16, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 17, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 18, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 19, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 20, hours: '08:00-09:00', class: '2CIT', room: '119' },
-        { id: 21, hours: '08:00-09:00', class: '2CIT', room: '119' },
-        { id: 22, hours: '08:00-09:00', class: '2CIT', room: '119' },
-        { id: 23, hours: '08:00-09:00', class: '2CIT', room: '119' },
-        { id: 24, hours: '08:00-09:00', class: '2CIT', room: '119' },
-        { id: 25, hours: '08:00-09:00', class: '2CIT', room: '119' },
-        { id: 26, hours: '08:00-09:00', class: '2CIT', room: '119' },
-        { id: 27, hours: '08:00-09:00', class: '2CIT', room: '119' },
-        { id: 28, hours: '08:00-09:00', class: '2CIT', room: '119' },
-        { id: 39, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 30, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 31, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 32, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 33, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 34, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 35, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 36, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 37, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 38, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 39, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 40, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 41, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 42, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 43, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 44, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 45, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 46, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 47, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 48, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 49, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 50, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 51, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 52, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 53, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 54, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 55, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 56, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 57, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 58, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 59, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 60, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 61, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 62, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 63, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 64, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 65, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 66, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 67, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 68, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 69, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 70, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 71, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 72, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 73, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 74, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 75, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 76, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 77, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 78, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 79, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 80, hours: '08:00-09:00', class: '5BIA', room: '119' },
-        { id: 81, hours: '08:00-09:00', class: '5BIA', room: '119' },
-    ];
-    classes = [
-        {c: '1ACA'}, {c: '1ACM'}, {c: '1AEE' }, {c: '1AIT'}, {c: '1AMM'}, {c: '1ATL'}, {c: '1BEE'}, {c: '1BIT'},
-        {c: '1BMM'}, {c: '1CIT'}, {c: '1CMM' }, {c: '1DIT'}, {c: '2ACM'}, {c: '2AE' }, {c: '2AIT'}, {c: '2AMM'},
-        {c: '2BCM'}, {c: '2BEE'}, {c: '2BIT' }, {c: '2BMM'}, {c: '2CA' }, {c: '2CEE'}, {c: '2CIT'}, {c: '2CMM'},
-        {c: '2DIT'}, {c: '2EIT'}, {c: '3ABS' }, {c: '3AC' }, {c: '3ACA'}, {c: '3AEC'}, {c: '3AET'}, {c: '3AIA'},
-        {c: '3AMM'}, {c: '3BBS'}, {c: '3BBIA'}, {c: '3BMM'}, {c: '3CIA'}, {c: '3CS' }, {c: '4AAT'}, {c: '4ABS'},
-        {c: '4AC' }, {c: '4ACA'}, {c: '4AET' }, {c: '4AIA'}, {c: '4AMM'}, {c: '4BBS'}, {c: '4BIA'}, {c: '4BMM'},
-        {c: '4CIA'}, {c: '4DIA'}, {c: '4EC'  }, {c: '5ABS'}, {c: '5ACA'}, {c: '5ACM'}, {c: '5ACS'}, {c: '5AET'},
-        {c: '5AIA'}, {c: '5AMM'}, {c: '5AT'  }, {c: '5BCM'}, {c: '5BIA'}, {c: '5BMM'}, {c: '5CIA'}, {c: '5DIA'},
-        {c: '5EC' },
-    ];
-    rooms = [
-        {n: 1}, {n: 2}, {n: 3}, {n: 4}, {n: 5}, {n: 6}, {n: 7}, {n: 8}, {n: 9}, {n: 10},
-        {n: 11}, {n: 12}, {n: 13}, {n: 14}, {n: 15}, {n: 16}, {n: 17}, {n: 18}, {n: 19}, {n: 20},
-        {n: 21}, {n: 22}, {n: 23}, {n: 24}, {n: 25}, {n: 26}, {n: 27}, {n: 28}, {n: 29}, {n: 30},
-        {n: 31}, {n: 32}, {n: 33}, {n: 34}, {n: 35}, {n: 36}, {n: 37}, {n: 38}, {n: 39}, {n: 40},
-        {n: 41}, {n: 42}, {n: 43}, {n: 44}, {n: 45}, {n: 46}, {n: 47}, {n: 48}, {n: 49}, {n: 50},
-        {n: 51}, {n: 52}, {n: 53}, {n: 54}, {n: 55}, {n: 56}, {n: 57}, {n: 58}, {n: 59}, {n: 60},
-        {n: 61}, {n: 62}, {n: 63}, {n: 64}, {n: 65}, {n: 66}, {n: 67}, {n: 68}, {n: 69}, {n: 70},
-        {n: 71}, {n: 72}, {n: 73}, {n: 74}, {n: 75}, {n: 76}, {n: 77}, {n: 78}, {n: 79}, {n: 80},
-        {n: 81}, {n: 82}, {n: 83}, {n: 84}, {n: 85}, {n: 86}, {n: 87}, {n: 88}, {n: 89}, {n: 90},
-        {n: 91}, {n: 92}, {n: 93}, {n: 94}, {n: 95}, {n: 96}, {n: 97}, {n: 98}, {n: 99}, {n: 100},
-        {n: 101}, {n: 102}, {n: 103}, {n: 104}, {n: 105}, {n: 106}, {n: 107}, {n: 108}, {n: 109}, {n: 110},
-        {n: 111}, {n: 112}, {n: 113}, {n: 114}, {n: 115}, {n: 116}, {n: 117}, {n: 118}, {n: 119}
-    ];
+    private http = inject(HttpService);
+    private backendSession = inject(BackendSession);
+    private ws = inject(WebsocketService);
+    private router = inject(Router);
+
+    allRows: SearchRow[] = [];
+    pr: SearchRow[] = [];
+
+    classes: { c: string }[] = [];
+    rooms: { n: string }[] = [];
+
+    selectedClass = '';
+    selectedRoom = '';
+    selectedStartHour = '';
+    selectedEndHour = '';
+
+    isLoading = false;
+    errorMessage = '';
+
+    async ngOnInit(): Promise<void> {
+        this.ws.connect();
+        this.ws.prenotazioniChanged$.subscribe(() => this.loadData());
+        await this.loadData();
+    }
+
+    async loadData(): Promise<void> {
+        const token = this.backendSession.sessionToken;
+        if (!token) {
+            this.errorMessage = 'Token mancante';
+            return;
+        }
+
+        this.isLoading = true;
+        this.errorMessage = '';
+
+        try {
+            const data = await this.http.getPrenotazioni(token);
+
+            this.allRows = data.map((item: any) => {
+                const classesList = Array.isArray(item.classi)
+                    ? item.classi.map((c: any) => c.nome)
+                    : [];
+
+                return {
+                    id: item.id,
+                    hours: `${item.ora_inizio.slice(0,5)}-${item.ora_fine.slice(0,5)}`,
+                    startHour: item.ora_inizio.slice(0,5),
+                    endHour: item.ora_fine.slice(0,5),
+                    classes: classesList.join(', '),
+                    classesList,
+                    room: String(item.aula?.numero ?? ''),
+                };
+            });
+
+            this.pr = [...this.allRows];
+
+            const classSet = new Set<string>();
+            const roomSet = new Set<string>();
+
+            for (const row of this.allRows) {
+                row.classesList.forEach(c => classSet.add(c));
+                if (row.room) roomSet.add(row.room);
+            }
+
+            this.classes = Array.from(classSet).sort().map(c => ({ c }));
+            this.rooms = Array.from(roomSet).sort((a, b) => Number(a) - Number(b)).map(n => ({ n }));
+        } catch (error) {
+            console.error(error);
+            this.errorMessage = 'Errore nel caricamento delle prenotazioni.';
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    applyFilters(): void {
+        this.pr = this.allRows.filter(row => {
+            const classOk = !this.selectedClass || row.classesList.includes(this.selectedClass);
+            const roomOk = !this.selectedRoom || row.room === this.selectedRoom;
+            const startOk = !this.selectedStartHour || row.startHour >= this.selectedStartHour;
+            const endOk = !this.selectedEndHour || row.endHour <= this.selectedEndHour;
+
+            return classOk && roomOk && startOk && endOk;
+        });
+    }
+
+    resetFilters(): void {
+        this.selectedClass = '';
+        this.selectedRoom = '';
+        this.selectedStartHour = '';
+        this.selectedEndHour = '';
+        this.pr = [...this.allRows];
+    }
+
+    openDetail(id: number): void {
+        this.router.navigate(['/detail'], { queryParams: { id } });
+    }
 }

@@ -9,6 +9,11 @@ import {
   updatePrenotazioneSchema,
 } from '../schemas/prenotazione.schema';
 import { PrenotazioniService } from '../services/prenotazioni.service';
+import {
+  emitPrenotazioneAggiornata,
+  emitPrenotazioneCreata,
+  emitPrenotazioneEliminata,
+} from '../websocket';
 
 const router = Router();
 
@@ -38,6 +43,7 @@ router.post(
   async (req: AuthRequest, res, next) => {
     try {
       const data = await PrenotazioniService.create({ ...req.body, utente_id: req.user!.id });
+      emitPrenotazioneCreata(data);
       res.status(201).json({ data });
     } catch (err) {
       next(err);
@@ -54,6 +60,7 @@ router.put(
   async (req: AuthRequest, res, next) => {
     try {
       const data = await PrenotazioniService.update(Number(req.params.id), req.user!, req.body);
+      emitPrenotazioneAggiornata(data);
       res.json({ data });
     } catch (err) {
       next(err);
@@ -68,7 +75,9 @@ router.delete(
   validate(prenotazioneIdParamSchema),
   async (req: AuthRequest, res, next) => {
     try {
-      const data = await PrenotazioniService.delete(Number(req.params.id), req.user!);
+      const id = Number(req.params.id);
+      const data = await PrenotazioniService.delete(id, req.user!);
+      emitPrenotazioneEliminata(id);
       res.json(data);
     } catch (err) {
       next(err);
