@@ -1,12 +1,21 @@
-<header>
+@if (type === "first") {
+    <header>
+        <app-logo />
+        <ul>
+            <li (click)="togglelist()">
+                <span>
+                    <p>{{name}} {{surname}}</p>
+                    <img ngSrc="images/temp.png" width="70" height="70" />
+                </span>
+            </li>
+            <li [style.display]="cascadelist">
+                <ul>
+                    <li (click)="toggle()"><p>{{theme}}</p></li>
+                </ul>
+            </li>
+        </ul>
+    </header>
+} @else {
     <app-logo />
-    <ul>
-        <li (click)="togglelist()">
-            <span>
-                <p>{{name}} {{surname}}</p>
-                <img ngSrc="images/temp.png" width="70" height="70" />
-            </span>
-        </li>
-        <li (click)="toggle()">{{theme}}</li>
-    </ul>
-</header>
+    <app-component-theme />
+}

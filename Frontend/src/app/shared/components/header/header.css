@@ -30,13 +30,13 @@ ul > li {
     position: relative;
     display: block;
     width: 100%;
-    height: 60px;
+    height: max-content;
 }
 ul > li > span {
     position: relative;
     display: flex;
     width: 100%;
-    height: 100%;
+    height: 60px;
 }
 ul > li > span > p {
     position: relative;
@@ -46,10 +46,7 @@ ul > li > span > p {
     margin: 0;
     line-height: 60px;
     font-size: 30px;
-}
-ul > li {
-    line-height: 60px;
-    font-size: 30px;
+    text-align: center;
 }
 ul > li > span > img {
     position: relative;
@@ -60,4 +57,35 @@ ul > li > span > img {
     top: 5px;
     right: 5px;
     border-radius: 25px;
+}
+ul > li > ul {
+    position: relative;
+    display: block;
+    width: auto;
+    height: max-content;
+    margin: 10px;
+    background-color: var(--box-bg-color);
+    border: solid var(--border-color) 1px;
+    border-radius: 5px;
+}
+ul > li > ul > li {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 30px;
+    border-bottom: solid var(--border-color) 1px;
+}
+ul > li > ul > li:last-child {
+    border-bottom: none;
+}
+
+ul > li > ul > li > p {
+    position: relative;
+    display: block;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    line-height: 30px;
+    font-size: 25px;
+    text-align: center;
 }

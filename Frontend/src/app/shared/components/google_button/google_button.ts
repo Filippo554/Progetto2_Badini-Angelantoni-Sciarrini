@@ -1,6 +1,9 @@
 import { Component, AfterViewInit, ElementRef, ViewChild, inject } from "@angular/core";
+import { Router } from "@angular/router";
 
-import { SessionService } from "../../../../core/services/session.service";
+import { SessionService } from "../../../../core/services/sessions.service";
+import { UserService } from "../../../../core/services/user.service";
+import { BackendSession } from "../../../../core/services/sessions.service";
 
 declare const google: any;
 
@@ -12,7 +15,9 @@ declare const google: any;
 export class GoogleButtonComponent implements AfterViewInit {
 
     sessionService = inject(SessionService);
-
+    user = inject(UserService);
+    router = inject(Router);
+    backendSession = inject(BackendSession);
     @ViewChild('googleBtn') googleBtn!: ElementRef;
 
     ngAfterViewInit() {
@@ -31,7 +36,11 @@ export class GoogleButtonComponent implements AfterViewInit {
                 .then(res => res.json())
                 .then(data => {
                     console.log('Token JWT:', data.token);
+                    this.backendSession.initialize(data.token);
                     console.log('Utente:', data.user);
+                    this.user.init(data.user);
+                    this.user.is = true;
+                    this.router.navigate(['/']);
                 })
                 .catch(err => console.error('Errore login:', err));
             }
