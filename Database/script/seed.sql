@@ -1,15 +1,123 @@
-INSERT INTO aula (numero, capienza, descrizione, piano)
-SELECT
-    gs AS numero,
-    30 AS capienza,
-    'Aula ' || gs AS descrizione,
-    CASE
-        WHEN gs BETWEEN   1 AND  30 THEN 0
-        WHEN gs BETWEEN  31 AND  60 THEN 1
-        WHEN gs BETWEEN  61 AND  90 THEN 2
-        WHEN gs BETWEEN  91 AND 119 THEN 3
-    END AS piano
-FROM generate_series(1, 119) AS gs;
+INSERT INTO aula (numero, capienza, descrizione, piano) VALUES
+(1, 30, 'Aula 1', 0),
+(2, 30, 'Aula 2', 0),
+(3, 30, 'Aula 3', 0),
+(4, 30, 'Aula 4', 0),
+(5, 30, 'Aula 5', 0),
+(6, 30, 'Aula 6', 0),
+(7, 30, 'Aula 7', 0),
+(8, 30, 'Aula 8', 0),
+(9, 30, 'Aula 9', 0),
+(10, 30, 'Aula 10', 0),
+(11, 30, 'Aula 11', 0),
+(12, 30, 'Aula 12', 0),
+(13, 30, 'Aula 13', 0),
+(14, 30, 'Aula 14', 0),
+(15, 30, 'Aula 15', 0),
+(16, 30, 'Aula 16', 0),
+(17, 30, 'Aula 17', 0),
+(18, 30, 'Aula 18', 0),
+(19, 30, 'Aula 19', 0),
+(20, 30, 'Aula 20', 0),
+(21, 30, 'Aula 21', 0),
+(22, 30, 'Aula 22', 0),
+(23, 30, 'Aula 23', 0),
+(24, 30, 'Aula 24', 0),
+(25, 30, 'Aula 25', 0),
+(26, 30, 'Aula 26', 0),
+(27, 30, 'Aula 27', 0),
+(28, 30, 'Aula 28', 0),
+(29, 30, 'Aula 29', 0),
+(30, 30, 'Aula 30', 0),
+(31, 30, 'Aula 31', 1),
+(32, 30, 'Aula 32', 1),
+(33, 30, 'Aula 33', 1),
+(34, 30, 'Aula 34', 1),
+(35, 30, 'Aula 35', 1),
+(36, 30, 'Aula 36', 1),
+(37, 30, 'Aula 37', 1),
+(38, 30, 'Aula 38', 1),
+(39, 30, 'Aula 39', 1),
+(40, 30, 'Aula 40', 1),
+(41, 30, 'Aula 41', 1),
+(42, 30, 'Aula 42', 1),
+(43, 30, 'Aula 43', 1),
+(44, 30, 'Aula 44', 1),
+(45, 30, 'Aula 45', 1),
+(46, 30, 'Aula 46', 1),
+(47, 30, 'Aula 47', 1),
+(48, 30, 'Aula 48', 1),
+(49, 30, 'Aula 49', 1),
+(50, 30, 'Aula 50', 1),
+(51, 30, 'Aula 51', 1),
+(52, 30, 'Aula 52', 1),
+(53, 30, 'Aula 53', 1),
+(54, 30, 'Aula 54', 1),
+(55, 30, 'Aula 55', 1),
+(56, 30, 'Aula 56', 1),
+(57, 30, 'Aula 57', 1),
+(58, 30, 'Aula 58', 1),
+(59, 30, 'Aula 59', 1),
+(60, 30, 'Aula 60', 1),
+(61, 30, 'Aula 61', 2),
+(62, 30, 'Aula 62', 2),
+(63, 30, 'Aula 63', 2),
+(64, 30, 'Aula 64', 2),
+(65, 30, 'Aula 65', 2),
+(66, 30, 'Aula 66', 2),
+(67, 30, 'Aula 67', 2),
+(68, 30, 'Aula 68', 2),
+(69, 30, 'Aula 69', 2),
+(70, 30, 'Aula 70', 2),
+(71, 30, 'Aula 71', 2),
+(72, 30, 'Aula 72', 2),
+(73, 30, 'Aula 73', 2),
+(74, 30, 'Aula 74', 2),
+(75, 30, 'Aula 75', 2),
+(76, 30, 'Aula 76', 2),
+(77, 30, 'Aula 77', 2),
+(78, 30, 'Aula 78', 2),
+(79, 30, 'Aula 79', 2),
+(80, 30, 'Aula 80', 2),
+(81, 30, 'Aula 81', 2),
+(82, 30, 'Aula 82', 2),
+(83, 30, 'Aula 83', 2),
+(84, 30, 'Aula 84', 2),
+(85, 30, 'Aula 85', 2),
+(86, 30, 'Aula 86', 2),
+(87, 30, 'Aula 87', 2),
+(88, 30, 'Aula 88', 2),
+(89, 30, 'Aula 89', 2),
+(90, 30, 'Aula 90', 2),
+(91, 30, 'Aula 91', 3),
+(92, 30, 'Aula 92', 3),
+(93, 30, 'Aula 93', 3),
+(94, 30, 'Aula 94', 3),
+(95, 30, 'Aula 95', 3),
+(96, 30, 'Aula 96', 3),
+(97, 30, 'Aula 97', 3),
+(98, 30, 'Aula 98', 3),
+(99, 30, 'Aula 99', 3),
+(100, 30, 'Aula 100', 3),
+(101, 30, 'Aula 101', 3),
+(102, 30, 'Aula 102', 3),
+(103, 30, 'Aula 103', 3),
+(104, 30, 'Aula 104', 3),
+(105, 30, 'Aula 105', 3),
+(106, 30, 'Aula 106', 3),
+(107, 30, 'Aula 107', 3),
+(108, 30, 'Aula 108', 3),
+(109, 30, 'Aula 109', 3),
+(110, 30, 'Aula 110', 3),
+(111, 30, 'Aula 111', 3),
+(112, 30, 'Aula 112', 3),
+(113, 30, 'Aula 113', 3),
+(114, 30, 'Aula 114', 3),
+(115, 30, 'Aula 115', 3),
+(116, 30, 'Aula 116', 3),
+(117, 30, 'Aula 117', 3),
+(118, 30, 'Aula 118', 3),
+(119, 30, 'Aula 119', 3);
 
 INSERT INTO classe (nome, indirizzo, anno) VALUES
 ('1AIT', 'Informatica e Telecomunicazioni', 1),
@@ -17,48 +125,50 @@ INSERT INTO classe (nome, indirizzo, anno) VALUES
 ('3AIT', 'Informatica e Telecomunicazioni', 3),
 ('4AIT', 'Informatica e Telecomunicazioni', 4),
 ('5AIT', 'Informatica e Telecomunicazioni', 5),
-('1BCM', 'Elettronica ed Elettrotecnica',   1),
-('2BCM', 'Elettronica ed Elettrotecnica',   2),
-('3BCM', 'Elettronica ed Elettrotecnica',   3),
-('4BCM', 'Elettronica ed Elettrotecnica',   4),
-('5BCM', 'Elettronica ed Elettrotecnica',   5),
-('1C', 'Meccanica Meccatronica',           1),
-('2C', 'Meccanica Meccatronica',           2),
-('3C', 'Meccanica Meccatronica',           3),
-('4C', 'Meccanica Meccatronica',           4),
-('5C', 'Meccanica Meccatronica',           5),
-('1D', 'Liceo Scientifico',                1),
-('2D', 'Liceo Scientifico',                2),
-('3D', 'Liceo Scientifico',                3),
-('4D', 'Liceo Scientifico',                4),
-('5D', 'Liceo Scientifico',                5);
+('1BCM', 'Elettronica ed Elettrotecnica', 1),
+('2BCM', 'Elettronica ed Elettrotecnica', 2),
+('3BCM', 'Elettronica ed Elettrotecnica', 3),
+('4BCM', 'Elettronica ed Elettrotecnica', 4),
+('5BCM', 'Elettronica ed Elettrotecnica', 5),
+('1C', 'Meccanica Meccatronica', 1),
+('2C', 'Meccanica Meccatronica', 2),
+('3C', 'Meccanica Meccatronica', 3),
+('4C', 'Meccanica Meccatronica', 4),
+('5C', 'Meccanica Meccatronica', 5),
+('1D', 'Liceo Scientifico', 1),
+('2D', 'Liceo Scientifico', 2),
+('3D', 'Liceo Scientifico', 3),
+('4D', 'Liceo Scientifico', 4),
+('5D', 'Liceo Scientifico', 5);
 
-INSERT INTO utente (nome, cognome, email, ruolo) VALUES
-('Admin',      'Sistema',      'admin@ittterni.org',      'admin'),
-('Mario',      'Rossi',        'mario.rossi@ittterni.org','docente'),
-('Laura',      'Bianchi',      'laura.bianchi@ittterni.org','docente'),
-('Giuseppe',   'Verdi',        'giuseppe.verdi@ittterni.org','ata'),
-('Anna',       'Neri',         'anna.neri@ittterni.org',  'studente'),
-('Filippo',    'Badini',       'filippo.badini@ittterni.org','admin'),
-('Vitali',     'Angelantoni',  'vitali.angelantoni@ittterni.org','docente'),
-('Alessandro', 'Sciarrini',    'alessandro.sciarrini@ittterni.org','admin');
+INSERT INTO utente (nome, cognome, email, ruolo, attivo) VALUES
+('Admin', 'Sistema', 'admin@ittterni.org', 'admin', TRUE),
+('Mario', 'Rossi', 'mario.rossi@ittterni.org', 'docente', TRUE),
+('Laura', 'Bianchi', 'laura.bianchi@ittterni.org', 'docente', TRUE),
+('Giuseppe', 'Verdi', 'giuseppe.verdi@ittterni.org', 'ata', TRUE),
+('Anna', 'Neri', 'anna.neri@ittterni.org', 'studente', TRUE),
+('Filippo', 'Badini', 'filippo.badini@ittterni.org', 'admin', TRUE),
+('Vitali', 'Angelantoni', 'vitali.angelantoni@ittterni.org', 'docente', TRUE),
+('Alessandro', 'Sciarrini', 'alessandro.sciarrini@ittterni.org', 'admin', TRUE);
 
-INSERT INTO prenotazione (aula_id, utente_id, data, ora_inizio, ora_fine, note)
-VALUES
-(1, 2, CURRENT_DATE,       '08:00', '10:00', 'Lezione di matematica'),
-(1, 2, CURRENT_DATE,       '10:00', '12:00', 'Lezione di fisica'),
-(2, 3, CURRENT_DATE,       '09:00', '11:00', 'Laboratorio informatica'),
-(3, 2, CURRENT_DATE + 1,   '08:00', '10:00', 'Verifica scritta'),
-(4, 3, CURRENT_DATE + 1,   '14:00', '16:00', 'Riunione dipartimento');
-
-INSERT INTO prenotazione_classe (prenotazione_id, classe_id)
-SELECT 1, id FROM classe WHERE nome = '4A' AND indirizzo LIKE 'Informatica%';
+INSERT INTO prenotazione (aula_id, utente_id, data, ora_inizio, ora_fine, note) VALUES
+(1, 2, CURDATE(), '08:00:00', '10:00:00', 'Lezione di matematica'),
+(1, 2, CURDATE(), '10:00:00', '12:00:00', 'Lezione di fisica'),
+(2, 3, CURDATE(), '09:00:00', '11:00:00', 'Laboratorio informatica'),
+(3, 2, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '08:00:00', '10:00:00', 'Verifica scritta'),
+(4, 3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00', '16:00:00', 'Riunione dipartimento');
 
 INSERT INTO prenotazione_classe (prenotazione_id, classe_id)
-SELECT 2, id FROM classe WHERE nome IN ('4A','5A') AND indirizzo LIKE 'Informatica%';
+SELECT 1, id FROM classe WHERE nome = '4AIT';
 
 INSERT INTO prenotazione_classe (prenotazione_id, classe_id)
-SELECT 3, id FROM classe WHERE nome = '3B' AND indirizzo LIKE 'Elettronica%';
+SELECT 2, id FROM classe WHERE nome IN ('4AIT', '5AIT');
 
 INSERT INTO prenotazione_classe (prenotazione_id, classe_id)
-SELECT 4, id FROM classe WHERE nome = '2A' AND indirizzo LIKE 'Informatica%';
+SELECT 3, id FROM classe WHERE nome = '3BCM';
+
+INSERT INTO prenotazione_classe (prenotazione_id, classe_id)
+SELECT 4, id FROM classe WHERE nome = '2AIT';
+
+INSERT INTO prenotazione_classe (prenotazione_id, classe_id)
+SELECT 5, id FROM classe WHERE nome = '1D';

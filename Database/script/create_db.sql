@@ -1,1 +1,4 @@
--- Se non si usa la gui, qui andranno i comandi del DDL.
+CREATE DATABASE IF NOT EXISTS prenotazione_aule;
+USE prenotazione_aule;
+SOURCE schema.sql;
+SOURCE seed.sql;
